@@ -1,5 +1,5 @@
 #pragma once
-#include "C:\Users\kbc21\OneDrive\デスクトップ\KISHIEngine\GameTemplate\k2EngineLow\gameObject\IGameobject.h"
+
 class Game : public IGameObject
 {
 public:
@@ -10,6 +10,6 @@ public:
 	void Render(RenderContext& rc);
 
 private:
-
+	ModelRender m_modelRender;
 };
 
