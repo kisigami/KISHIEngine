@@ -72,7 +72,6 @@ namespace  nsK2EngineLow {
 		}
 	
 		m_animation.Progress(g_gameTime->GetFrameDeltaTime());
-		
 	}
 
 	void ModelRender::Draw(RenderContext& rc)

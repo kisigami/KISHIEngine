@@ -1,5 +1,7 @@
 #pragma once
 
+class Player;
+
 class Game : public IGameObject
 {
 public:
@@ -11,5 +13,7 @@ public:
 
 private:
 	ModelRender m_modelRender;
+
+	Player* m_player = nullptr;
 };
 

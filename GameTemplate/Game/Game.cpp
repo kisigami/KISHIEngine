@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Game.h"
 
+#include "Player.h"
+
 Game::Game()
 {
 
@@ -13,16 +15,16 @@ Game::~Game()
 
 bool Game::Start()
 {
-	m_modelRender.Init("Assets/modelData/unityChan.tkm", nullptr, 0, enModelUpAxisZ);
+	m_player = NewGO<Player>(0, "player");
 	return true;
 }
 
 void Game::Update()
 {
-	m_modelRender.Update();
+	
 }
 
 void Game::Render(RenderContext& rc)
 {
-	m_modelRender.Draw(rc);
+
 }
