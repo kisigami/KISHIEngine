@@ -23,6 +23,9 @@ namespace  nsK2EngineLow {
 		initData.m_tkmFilePath = filePath;
 		initData.m_fxFilePath = "Assets/shader/model.fx";
 
+		initData.m_expandConstantBuffer = &g_directionLight;
+		initData.m_expandConstantBufferSize = sizeof(g_directionLight);
+
 		if (animationClips == nullptr)
 		{
 			initData.m_vsEntryPointFunc = "VSMain";

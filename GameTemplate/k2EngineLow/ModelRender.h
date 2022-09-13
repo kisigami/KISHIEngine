@@ -31,6 +31,21 @@ namespace  nsK2EngineLow {
 			m_rotation = rotation;
 		}
 
+		void PlayAnimation(int animNo, float interpolateTime = 0.0f)
+		{
+			m_animation.Play(animNo, interpolateTime);
+		}
+
+		bool IsPlayingAnimation() const
+		{
+			return m_animation.IsPlaying();
+		}
+
+		void SetAnimationSpeed(const float animationSpeed)
+		{
+			m_animationSpeed = animationSpeed;
+		}
+
 	private:
 		void InitSkeleton(const char* filePath);
 
@@ -42,6 +57,7 @@ namespace  nsK2EngineLow {
 		AnimationClip* m_animationClips = nullptr;
 		Animation      m_animation;
 		int            m_numAnimationClips = 0;
+		float		   m_animationSpeed = 1.0f;
 		Vector3        m_position = Vector3::Zero;
 		Vector3        m_scale = Vector3::One;
 		Quaternion     m_rotation = Quaternion::Identity;
