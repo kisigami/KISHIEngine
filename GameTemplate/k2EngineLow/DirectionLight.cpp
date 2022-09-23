@@ -7,15 +7,21 @@ namespace nsK2EngineLow {
 
 	DirectionLight::DirectionLight()
 	{
-		m_directionLight.ligDirection.x = 0.0f;
-		m_directionLight.ligDirection.y = 1.0f;
-		m_directionLight.ligDirection.z = 1.0f;
+		//ディレクションライト方向
+		m_light.ligDirection.x = 0.0f;
+		m_light.ligDirection.y = 1.0f;
+		m_light.ligDirection.z = 1.0f;
+		//正規化
+		m_light.ligDirection.Normalize();
+		//ディレクションライトのカラー
+		m_light.ligColor.x = 0.7f;
+		m_light.ligColor.y = 0.7f;
+		m_light.ligColor.z = 0.7f;
 
-		m_directionLight.ligDirection.Normalize();
-
-		m_directionLight.ligColor.x = 1.5f;
-		m_directionLight.ligColor.y = 1.5f;
-		m_directionLight.ligColor.z = 1.5f;
+		//アンビエントライト環境光
+		m_light.ambentLight.x = 0.5f;
+		m_light.ambentLight.y = 0.5f;
+		m_light.ambentLight.z = 0.5f;
 	}
 
 	DirectionLight::~DirectionLight()

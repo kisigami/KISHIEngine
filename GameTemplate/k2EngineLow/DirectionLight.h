@@ -10,9 +10,10 @@ namespace nsK2EngineLow {
 			Vector3 ligDirection;
 			float pad;
 			Vector3 ligColor;
+			float pad1;
+			Vector3 ambentLight;
 		};
-		
-		
+
 	public:
 		DirectionLight();
 		~DirectionLight();
@@ -21,16 +22,16 @@ namespace nsK2EngineLow {
 
 		void SetLigDirection(const Vector3& lig)
 		{
-			m_directionLight.ligDirection = lig;
+			m_light.ligDirection = lig;
 		}
 
 		void SetLigColor(const Vector3& color)
 		{
-			m_directionLight.ligColor = color;
+			m_light.ligColor = color;
 		}
 
 	private:
-		DirLight m_directionLight;
+		DirLight m_light;
 	};
 
 	extern DirectionLight g_directionLight;
