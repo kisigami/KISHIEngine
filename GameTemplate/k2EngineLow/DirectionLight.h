@@ -10,6 +10,8 @@ namespace nsK2EngineLow {
 			Vector3 ligDirection;
 			float pad;
 			Vector3 ligColor;
+			float pad0;
+			Vector3 eyePos;
 			float pad1;
 			Vector3 ambentLight;
 		};

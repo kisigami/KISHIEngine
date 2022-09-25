@@ -28,7 +28,11 @@ bool Player::Start()
 
 void Player::Update()
 {
-	m_rotation.SetRotationDegY(180.0f);
+	if (g_pad[0]->IsPress(enButtonA))
+	{
+		m_rotation.AddRotationDegY(2.0f);
+	}
+
 	m_modelRender.SetRotation(m_rotation);
 	m_modelRender.Update();
 }
