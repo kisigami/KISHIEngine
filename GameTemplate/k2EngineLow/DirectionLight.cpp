@@ -3,9 +3,7 @@
 
 namespace nsK2EngineLow {
 
-	DirectionLight g_directionLight;
-
-	DirectionLight::DirectionLight()
+	DirectionLight0::DirectionLight0()
 	{
 		//ディレクションライト方向
 		m_light.ligDirection.x = 0.0f;
@@ -27,12 +25,12 @@ namespace nsK2EngineLow {
 		m_light.ambentLight.z = 0.2f;
 	}
 
-	DirectionLight::~DirectionLight()
+	DirectionLight0::~DirectionLight0()
 	{
 
 	}
 
-	void DirectionLight::Update()
+	void DirectionLight0::Update()
 	{
 
 	}

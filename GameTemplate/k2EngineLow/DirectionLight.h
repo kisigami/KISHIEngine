@@ -2,23 +2,24 @@
 
 namespace nsK2EngineLow {
 
-	class DirectionLight
+	struct DirLight
+	{
+		Vector3 ligDirection;
+		float pad;
+		Vector3 ligColor;
+		float pad0;
+		Vector3 eyePos;
+		float pad1;
+		Vector3 ambentLight;
+	};
+
+	class DirectionLight0 : public Noncopyable
 	{
 	public:
-		struct DirLight
-		{
-			Vector3 ligDirection;
-			float pad;
-			Vector3 ligColor;
-			float pad0;
-			Vector3 eyePos;
-			float pad1;
-			Vector3 ambentLight;
-		};
 
 	public:
-		DirectionLight();
-		~DirectionLight();
+		DirectionLight0();
+		~DirectionLight0();
 
 		void Update();
 
@@ -35,6 +36,4 @@ namespace nsK2EngineLow {
 	private:
 		DirLight m_light;
 	};
-
-	extern DirectionLight g_directionLight;
 }

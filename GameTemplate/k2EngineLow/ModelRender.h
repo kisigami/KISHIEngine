@@ -1,6 +1,7 @@
 #pragma once
 
 namespace  nsK2EngineLow {
+
 	class ModelRender:public IRenderer
 	{
 	public:

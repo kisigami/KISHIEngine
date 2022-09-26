@@ -1,6 +1,7 @@
 #include "k2EngineLowPreCompile.h"
 #include "ModelRender.h"
 
+
 namespace  nsK2EngineLow {
 
 	ModelRender::ModelRender()
@@ -23,8 +24,9 @@ namespace  nsK2EngineLow {
 		initData.m_tkmFilePath = filePath;
 		initData.m_fxFilePath = "Assets/shader/model.fx";
 
-		initData.m_expandConstantBuffer = &g_directionLight;
-		initData.m_expandConstantBufferSize = sizeof(g_directionLight);
+		g_sceneLight.Init();
+		initData.m_expandConstantBuffer = &g_sceneLight;
+		initData.m_expandConstantBufferSize = sizeof(g_sceneLight);
 
 		if (animationClips == nullptr)
 		{

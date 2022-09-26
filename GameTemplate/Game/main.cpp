@@ -19,6 +19,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	g_camera3D->SetPosition({ 0.0f, 150.0f, 200.0f });
 	g_camera3D->SetTarget({ 0.0f, 50.0f, 0.0f });
 
+
 	NewGO<Game>(0, "game");
 
 	// ここからゲームループ。
@@ -32,6 +33,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		// ゲームオブジェクトマネージャーの描画処理を呼び出す。
 		g_k2EngineLow->ExecuteRender();
+
+
+
 
 		// デバッグ描画処理を実行する。
 		g_k2EngineLow->DebubDrawWorld();

@@ -5,6 +5,7 @@
 namespace nsK2EngineLow {
 	K2EngineLow* g_engine = nullptr;
 	GameTime* g_gameTime = nullptr;
+	//SceneLight* g_sceneLight = nullptr;
 
 	K2EngineLow::~K2EngineLow()
 	{
@@ -23,6 +24,8 @@ namespace nsK2EngineLow {
 	}
 	void K2EngineLow::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
 	{
+		
+
 		if (hwnd) {
 			//グラフィックエンジンの初期化。
 			m_graphicsEngine = new GraphicsEngine();

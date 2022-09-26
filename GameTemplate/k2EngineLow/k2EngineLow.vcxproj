@@ -326,6 +326,9 @@
     <ClCompile Include="physics\PhysicsStaticObject.cpp" />
     <ClCompile Include="physics\RigidBody.cpp" />
     <ClCompile Include="physics\SphereCollider.cpp" />
+    <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="SceneLight.cpp" />
     <ClCompile Include="sound\SoundEngine.cpp" />
     <ClCompile Include="sound\SoundSource.cpp" />
     <ClCompile Include="sound\WaveFile.cpp" />
@@ -407,6 +410,7 @@
     <ClInclude Include="math\Matrix.h" />
     <ClInclude Include="math\Vector.h" />
     <ClInclude Include="ModelRender.h" />
+    <ClInclude Include="MyRenderer.h" />
     <ClInclude Include="online\SyncOnlineTwoPlayerMatchEngine.h" />
     <ClInclude Include="physics\BoxCollider.h" />
     <ClInclude Include="physics\CapsuleCollider.h" />
@@ -420,6 +424,9 @@
     <ClInclude Include="physics\PhysicsStaticObject.h" />
     <ClInclude Include="physics\RigidBody.h" />
     <ClInclude Include="physics\SphereCollider.h" />
+    <ClInclude Include="PostEffect.h" />
+    <ClInclude Include="RenderingEngine.h" />
+    <ClInclude Include="SceneLight.h" />
     <ClInclude Include="sound\SoundEngine.h" />
     <ClInclude Include="sound\SoundSource.h" />
     <ClInclude Include="sound\WaveFile.h" />

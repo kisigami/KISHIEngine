@@ -2,6 +2,7 @@
  * @brief	シンプルなモデルシェーダー。
  */
 
+//ディレクションライト用の構造体
 
 ////////////////////////////////////////////////
 // 定数バッファ。
@@ -13,7 +14,6 @@ cbuffer ModelCb : register(b0){
 	float4x4 mProj;
 };
 
-//ディレクションライト用の構造体
 struct DirectionLightCb
 {
     float3 dirDirection;
@@ -46,6 +46,7 @@ struct SVSIn
     float2 uv       : TEXCOORD0; //UV座標。
     float3 tangent  : TANGENT;
     float3 biNormal : BINORMAL;
+    
 	SSkinVSIn         skinVert;	    //スキン用のデータ。
 };
 
@@ -208,21 +209,23 @@ float4 PSMain( SPSIn psIn ) : SV_Target0
     
     //法線を計算
     float3 normal = CalcNormal(psIn.normal, psIn.tangent, psIn.biNormal, psIn.uv);
-   
+    
     //Lambert拡散反射を計算
     float3 diffuseLig = CalcLambertDiffuse(normal);
    
     //Phong鏡面反射を計算
     float3 specLig = CalcPhongSpecular(normal, psIn.worldPos) * 10.0f;
    
+     //ディレクションライトを計算
+    float3 directionLight = CalcDirectionLight(normal);
+    
     //スペキュラマップからスペキュラ反射の強さをサンプリング
     float specPower = g_specularMap.Sample(g_sampler, psIn.uv).r;
   
     //鏡面反射の強さを鏡面反射光に乗算する
     specLig *= specPower;
     
-    //ディレクションライトを計算
-    float3 directionLight = CalcDirectionLight(normal);
+ 
     
     //ディレクションライト、拡散反射、鏡面反射、環境光を加算計算
     float3 lig = directionLight + diffuseLig + specLig + ambientLight;
