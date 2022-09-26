@@ -19,6 +19,7 @@ private:
 
 private:
 	ModelRender m_modelRender;
+	ModelRender m_modelRender2;
 	Animation m_animation;
 	AnimationClip m_animationClipArray[enAnimClip_Num];
 	Vector3				m_position = Vector3::Zero;

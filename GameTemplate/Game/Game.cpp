@@ -2,6 +2,7 @@
 #include "Game.h"
 
 #include "Player.h"
+#include "BackGround.h"
 
 Game::Game()
 {
@@ -15,7 +16,9 @@ Game::~Game()
 
 bool Game::Start()
 {
+	m_backGround = NewGO<BackGround>(0, "background");
 	m_player = NewGO<Player>(0, "player");
+
 	return true;
 }
 

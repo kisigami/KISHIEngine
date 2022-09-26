@@ -1,6 +1,7 @@
 #pragma once
 
 class Player;
+class BackGround;
 
 class Game : public IGameObject
 {
@@ -15,5 +16,6 @@ private:
 	ModelRender m_modelRender;
 
 	Player* m_player = nullptr;
+	BackGround* m_backGround = nullptr;
 };
 
