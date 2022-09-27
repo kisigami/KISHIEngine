@@ -77,10 +77,10 @@ using namespace Microsoft::WRL;
 #include "graphics/GaussianBlur.h"
 
 #include "IRenderer.h"
-#include "MyRenderer.h"
 #include "ModelRender.h"
 #include "SceneLight.h"
 #include "Bloom.h"
+#include "Monochrome.h"
 #include "PostEffect.h"
 
 #include "RenderingEngine.h"

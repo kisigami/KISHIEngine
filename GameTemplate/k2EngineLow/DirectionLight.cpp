@@ -17,7 +17,7 @@ namespace nsK2EngineLow {
 		m_light.ligColor.y = 0.5f;
 		m_light.ligColor.z = 0.5f;
 
-		m_light.eyePos = Vector3({ 0.0f, 150.0f, 200.0f });
+		m_light.eyePos = g_camera3D->GetPosition();
 
 		//アンビエントライト環境光
 		m_light.ambentLight.x = 0.2f;

@@ -2,10 +2,12 @@
 #include "BackGround.h"
 
 BackGround::BackGround()
-{}
+{
+}
 
 BackGround::~BackGround()
-{}
+{
+}
 
 bool BackGround::Start()
 {
@@ -21,5 +23,5 @@ void BackGround::Update()
 
 void BackGround::Render(RenderContext& rc)
 {
-	//m_modelRender.Draw(rc);
+	m_modelRender.Draw(rc);
 }

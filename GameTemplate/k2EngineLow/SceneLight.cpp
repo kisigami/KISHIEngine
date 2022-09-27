@@ -17,7 +17,7 @@ namespace nsK2EngineLow
 		m_light.directionlight.ligColor.y = 0.5f;
 		m_light.directionlight.ligColor.z = 0.5f;
 
-		m_light.eyePos = Vector3({ 0.0f, 150.0f, 200.0f });
+		m_light.eyePos = g_camera3D->GetPosition();
 
 		m_light.ambientLight.x = 0.2f;
 		m_light.ambientLight.y = 0.2f;
@@ -26,6 +26,6 @@ namespace nsK2EngineLow
 
 	void SceneLight::Update()
 	{
-		//m_light.eyePos = Vector3({ 0.0f, 150.0f, 200.0f });
+		m_light.eyePos = g_camera3D->GetPosition();
 	}
 }

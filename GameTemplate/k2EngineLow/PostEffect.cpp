@@ -6,6 +6,7 @@ namespace nsK2EngineLow
     void PostEffect::Init(RenderTarget& mainRenderTarget)
     {
         m_bloom.Init(mainRenderTarget);
+       
     }
     void PostEffect::Render(RenderContext& rc, RenderTarget& mainRenderTarget)
     {
