@@ -110,19 +110,26 @@ namespace nsK2EngineLow
 
 	void Bloom::InitGaussianBlur()
 	{
-		m_gaussianBlur.Init(&m_luminanceRenderTarget.GetRenderTargetTexture());
+		m_gaussianBlur[0].Init(&m_luminanceRenderTarget.GetRenderTargetTexture());
+		m_gaussianBlur[1].Init(&m_gaussianBlur[0].GetBokeTexture());
+		m_gaussianBlur[2].Init(&m_gaussianBlur[1].GetBokeTexture());
+		m_gaussianBlur[3].Init(&m_gaussianBlur[2].GetBokeTexture());
 	}
 
 	void Bloom::InitFinalSprite()
 	{
 		SpriteInitData finalSpriteInitData;
 
-		finalSpriteInitData.m_textures[0] = &m_gaussianBlur.GetBokeTexture();
-
+		finalSpriteInitData.m_textures[0] = &m_gaussianBlur[0].GetBokeTexture();
+		finalSpriteInitData.m_textures[1] = &m_gaussianBlur[1].GetBokeTexture();
+		finalSpriteInitData.m_textures[2] = &m_gaussianBlur[2].GetBokeTexture();
+		finalSpriteInitData.m_textures[3] = &m_gaussianBlur[3].GetBokeTexture();
+	
 		finalSpriteInitData.m_width = 1600;
 		finalSpriteInitData.m_height = 900;
 
-		finalSpriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
+		finalSpriteInitData.m_fxFilePath = "Assets/shader/postEffect.fx";
+		finalSpriteInitData.m_psEntryPoinFunc = "PSBloomFinal";
 
 		finalSpriteInitData.m_alphaBlendMode = AlphaBlendMode_Add;
 
@@ -142,7 +149,10 @@ namespace nsK2EngineLow
 
 	void Bloom::ExcuteGaussianBlur(RenderContext& rc)
 	{
-		m_gaussianBlur.ExecuteOnGPU(rc,20);
+		m_gaussianBlur[0].ExecuteOnGPU(rc, 10);
+		m_gaussianBlur[1].ExecuteOnGPU(rc, 10);
+		m_gaussianBlur[2].ExecuteOnGPU(rc, 10);
+		m_gaussianBlur[3].ExecuteOnGPU(rc, 10);
 	}
 
 	void Bloom::PulsBokeSprite(RenderContext& rc,RenderTarget& mainRenderTarget)

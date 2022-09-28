@@ -24,7 +24,7 @@ namespace nsK2EngineLow
         Sprite         m_luminanceSprite;
         Sprite         m_finalSprite;
         Sprite         m_copyToFrameBufferSprite;
-        GaussianBlur   m_gaussianBlur;
+        GaussianBlur   m_gaussianBlur[4];
     };
     extern Bloom g_bloom;
 };

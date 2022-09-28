@@ -13,13 +13,16 @@ namespace nsK2EngineLow
 			
 		m_light.directionlight.ligDirection.Normalize();
 
-		m_light.directionlight.ligColor.x = 1.5f;
-		m_light.directionlight.ligColor.y = 1.5f;
-		m_light.directionlight.ligColor.z = 1.5f;
+		m_light.directionlight.ligColor.x = 1.8f;
+		m_light.directionlight.ligColor.y = 1.8f;
+		m_light.directionlight.ligColor.z = 1.8f;
 
-		Vector3 a;
-		a.x -= 100.0f;
-		m_light.eyePos = a;//g_camera3D->GetPosition();
+		/*m_light.directionlight.ligColor.x = 10.5f;
+		m_light.directionlight.ligColor.y = 10.5f;
+		m_light.directionlight.ligColor.z = 10.5f;*/
+
+		m_light.eyePos = g_camera3D->GetPosition();
+		m_light.eyePos.x += 100.0f;
 
 		m_light.ambientLight.x = 0.2f;
 		m_light.ambientLight.y = 0.2f;

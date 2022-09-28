@@ -35,6 +35,7 @@ void Player::Update()
 	}
 
 	m_modelRender.SetRotation(m_rotation);
+	m_modelRender.SetPosition(m_position);
 	m_modelRender.Update();
 }
 
