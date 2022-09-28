@@ -13,7 +13,7 @@ namespace nsK2EngineLow {
 	class GameTime;
 	class Texture;
 	class Font;
-	class RenderingEngine;
+	class Bloom;
 
 	class K2EngineLow {
 	public:

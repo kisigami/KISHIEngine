@@ -20,7 +20,7 @@ namespace nsK2EngineLow
 
 	void Monochrome::InitOffscreenRenderTarget()
 	{
-		//レンダリングターゲットを作成
+		//オフスクリーンレンダリングターゲットを作成
 		m_offscreenRenderTarget.Create(
 			1600,
 			900,
@@ -45,14 +45,14 @@ namespace nsK2EngineLow
 
 	void Monochrome::ChangeRenderTarget(RenderContext& rc)
 	{
-		RenderTarget* rtArray[] = { &m_offscreenRenderTarget };
+		/*RenderTarget* rtArray[] = { &m_offscreenRenderTarget };
 		rc.WaitUntilToPossibleSetRenderTargets(1, rtArray);
 		rc.SetRenderTargets(1, rtArray);
 		rc.ClearRenderTargetViews(1, rtArray);
 
 		g_engine->ExecuteRender();
 
-		rc.WaitUntilFinishDrawingToRenderTargets(1, rtArray);
+		rc.WaitUntilFinishDrawingToRenderTargets(1, rtArray);*/
 	}
 
 	void Monochrome::ChangeOnscreenRenderTarget(RenderContext& rc)

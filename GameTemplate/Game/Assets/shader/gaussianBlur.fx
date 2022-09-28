@@ -4,20 +4,20 @@
 
 cbuffer cb : register(b0)
 {
-    float4x4 mvp;       // MVP行列
-    float4 mulColor;    // 乗算カラー
+    float4x4 mvp; // MVP行列
+    float4 mulColor; // 乗算カラー
 };
 
 struct VSInput
 {
     float4 pos : POSITION;
-    float2 uv  : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
 struct PSInput
 {
     float4 pos : SV_POSITION;
-    float2 uv  : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
 /*!
@@ -30,7 +30,6 @@ PSInput VSMain(VSInput In)
     psIn.uv = In.uv;
     return psIn;
 }
-
 Texture2D<float4> mainRenderTargetTexture : register(t0); // メインレンダリングターゲットのテクスチャ
 sampler Sampler : register(s0);
 
@@ -59,14 +58,12 @@ cbuffer CBBlur : register(b1)
 {
     float4 weight[2]; // 重み
 }
-
 /*!
  * @brief 横ブラー頂点シェーダー
  */
 PS_BlurInput VSXBlur(VSInput In)
 {
     // step-13 横ブラー用の頂点シェーダーを実装
-
     PS_BlurInput Out;
 
     // 座標変換
@@ -84,7 +81,6 @@ PS_BlurInput VSXBlur(VSInput In)
     Out.tex0.xy = float2(1.0f / texSize.x, 0.0f);
 
     // 基準テクセルからU座標を+3テクセルずらすためのオフセットを計算する
-
     Out.tex1.xy = float2(3.0f / texSize.x, 0.0f);
 
     // 基準テクセルからU座標を+5テクセルずらすためのオフセットを計算する
@@ -125,16 +121,15 @@ PS_BlurInput VSXBlur(VSInput In)
     Out.tex5 += float4(tex, tex);
     Out.tex6 += float4(tex, tex);
     Out.tex7 += float4(tex, tex);
-
     return Out;
 }
 
 /*!
- * @brief Yブラー頂点シェーダー
+ * @brief 縦ブラー頂点シェーダー
  */
 PS_BlurInput VSYBlur(VSInput In)
 {
-    // step-14 Yブラー用の頂点シェーダーを実装
+    // step-14 縦ブラー用の頂点シェーダーを実装
     PS_BlurInput Out;
 
     // 座標変換
@@ -200,11 +195,11 @@ PS_BlurInput VSYBlur(VSInput In)
  */
 float4 PSBlur(PS_BlurInput In) : SV_Target0
 {
-    // step-15 X,Yブラー用のピクセルシェーダーを実装
+    // step-15 横、縦ブラー用のピクセルシェーダーを実装
     float4 Color;
 
     // 基準テクセルからプラス方向に8テクセル、重み付きでサンプリング
-    Color  = weight[0].x * sceneTexture.Sample(Sampler, In.tex0.xy);
+    Color = weight[0].x * sceneTexture.Sample(Sampler, In.tex0.xy);
     Color += weight[0].y * sceneTexture.Sample(Sampler, In.tex1.xy);
     Color += weight[0].z * sceneTexture.Sample(Sampler, In.tex2.xy);
     Color += weight[0].w * sceneTexture.Sample(Sampler, In.tex3.xy);

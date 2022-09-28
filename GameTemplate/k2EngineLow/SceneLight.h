@@ -27,6 +27,26 @@ namespace nsK2EngineLow
 		void Init();
 		void Update();
 
+		void SetLigDirection(const Vector3& lig)
+		{
+			m_light.directionlight.ligDirection = lig;
+		}
+
+		void SetLigColor(const Vector3& color)
+		{
+			m_light.directionlight.ligColor = color;
+		}
+
+		void SetAmbientLihgt(const Vector3& lig)
+		{
+			m_light.ambientLight = lig;
+		}
+
+		void SetEyePos(const Vector3& lig)
+		{
+			m_light.eyePos = lig;
+		}
+
 		Light& GetLight()
 		{
 			return m_light;

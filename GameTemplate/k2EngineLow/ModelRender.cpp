@@ -24,9 +24,9 @@ namespace  nsK2EngineLow {
 		initData.m_tkmFilePath = filePath;
 		initData.m_fxFilePath = "Assets/shader/model.fx";
 
-		g_sceneLight.Init();
 		initData.m_expandConstantBuffer = &g_sceneLight;
 		initData.m_expandConstantBufferSize = sizeof(g_sceneLight);
+		initData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
 		if (animationClips == nullptr)
 		{
@@ -42,7 +42,7 @@ namespace  nsK2EngineLow {
 
 		initData.m_modelUpAxis = enModelUpAxis;
 		m_model.Init(initData);
-		Update();
+		//Update();
 	}
 
 	void ModelRender::InitSkeleton(const char* filePath)

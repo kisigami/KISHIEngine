@@ -17,6 +17,7 @@ struct PSInput
 };
 
 Texture2D<float4> sceneTexture : register(t0); // シーンテクスチャ
+Texture2D<float4> mainRenderTargetTexture : register(t1);
 sampler Sampler : register(s0);
 
 PSInput VSMain(VSInput In)
@@ -32,10 +33,26 @@ float4 PSMain(PSInput In) : SV_Target0
     float4 color = sceneTexture.Sample(Sampler, In.uv);
 
     // step-7 ピクセルカラーをモノクロ化する
-    float Y  =  0.299f * color.r + 0.587f * color.b + 0.114f * color.b;
+    float Y = 0.299f * color.r + 0.587f * color.b + 0.114f * color.b;
     color.r = Y;
     color.g = Y;
     color.b = Y;
+
+    return color;
+}
+
+float4 PSSamplingLuminance(PSInput In) : SV_Target0
+{
+    // メインレンダリングターゲットからカラーをサンプリング
+    float4 color = sceneTexture.Sample(Sampler, In.uv);
+
+    // サンプリングしたカラーの明るさを計算
+    float t = dot(color.xyz, float3(0.2125f, 0.7154f, 0.0721f));
+
+    // clip()関数は引数の値がマイナスになると、以降の処理をスキップする
+    // なので、マイナスになるとピクセルカラーは出力されない
+    // 今回の実装はカラーの明るさが1以下ならピクセルキルする
+    clip(t - 1.0f);
 
     return color;
 }
