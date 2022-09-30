@@ -1,9 +1,6 @@
 /*!
  * @brief	シンプルなモデルシェーダー。
  */
-
-//ディレクションライト用の構造体
-
 ////////////////////////////////////////////////
 // 定数バッファ。
 ////////////////////////////////////////////////
@@ -214,13 +211,13 @@ float4 PSMain( SPSIn psIn ) : SV_Target0
     float3 diffuseLig = CalcLambertDiffuse(normal);
    
     //Phong鏡面反射を計算
-    float3 specLig = CalcPhongSpecular(normal, psIn.worldPos) * 10.0f;
+    float3 specLig = CalcPhongSpecular(normal, psIn.worldPos);
    
      //ディレクションライトを計算
     float3 directionLight = CalcDirectionLight(normal);
     
     //スペキュラマップからスペキュラ反射の強さをサンプリング
-    float specPower = g_specularMap.Sample(g_sampler, psIn.uv).r;
+    float specPower = g_specularMap.Sample(g_sampler, psIn.uv).r*10.0f;
   
     //鏡面反射の強さを鏡面反射光に乗算する
     specLig *= specPower;
@@ -231,5 +228,6 @@ float4 PSMain( SPSIn psIn ) : SV_Target0
     float3 lig = directionLight + diffuseLig + specLig + ambientLight;
     
     albedoColor.xyz *= lig;
+    
 	return albedoColor;
 }

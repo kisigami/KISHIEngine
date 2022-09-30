@@ -227,11 +227,11 @@
     </ClCompile>
     <ClCompile Include="ModelRender.cpp" />
     <ClCompile Include="IRenderer.cpp" />
-    <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="Bloom.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="SceneLight.cpp" />
     <ClCompile Include="Monochrome.cpp" />
+    <ClCompile Include="PostEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -508,11 +508,11 @@
     </ClInclude>
     <ClInclude Include="ModelRender.h" />
     <ClInclude Include="IRenderer.h" />
-    <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="Bloom.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="SceneLight.h" />
     <ClInclude Include="Monochrome.h" />
+    <ClInclude Include="PostEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">

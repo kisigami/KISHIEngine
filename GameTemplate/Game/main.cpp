@@ -1,11 +1,9 @@
 #include "stdafx.h"
 #include "system/system.h"
-#include "bloom.h"
 #include "Game.h"
 
 // K2EngineLowのグローバルアクセスポイント。
 K2EngineLow* g_k2EngineLow = nullptr;
-
 
 /// <summary>
 /// メイン関数
@@ -19,23 +17,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	g_k2EngineLow = new K2EngineLow();
 	g_k2EngineLow->Init(g_hWnd, FRAME_BUFFER_W, FRAME_BUFFER_H);
 
-	//メインレンダリングターゲット作成
-	RenderTarget mainRenderTarget;
-	mainRenderTarget.Create(
-		1600,
-		900,
-		1,
-		1,
-		DXGI_FORMAT_R32G32B32A32_FLOAT,
-		DXGI_FORMAT_D32_FLOAT
-	);
-
-	//強いライト
+	//ライト初期化
 	g_sceneLight.Init();
+	//レンダリングエンジンの初期化
+	g_renderingEngine.Init();
 
+	//ゲーム作成
 	auto game = NewGO<Game>(0, "game");
-
-	g_bloom.Init(mainRenderTarget);
 
 	auto& renderContext = g_graphicsEngine->GetRenderContext();
 
@@ -45,22 +33,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		// フレームの開始時に呼び出す必要がある処理を実行
 		g_k2EngineLow->BeginFrame();
 
-		//レンダリングターゲットとして使用可能になるまで待つ
-		renderContext.WaitUntilToPossibleSetRenderTarget(mainRenderTarget);
-		//レンダリングターゲットを設定
-		renderContext.SetRenderTargetAndViewport(mainRenderTarget);
-		//レンダリングターゲットをクリア
-		renderContext.ClearRenderTargetView(mainRenderTarget);
+		//レンダリングターゲットの設定
+		g_renderingEngine.SetMainRenderTarget(renderContext);
 
-		//更新
+		//更新処理
 		g_k2EngineLow->ExecuteUpdate();
 
-		//描画
-		g_engine->ExecuteRender();
-		renderContext.WaitUntilFinishDrawingToRenderTarget(mainRenderTarget);
+		//描画処理
+		g_k2EngineLow->ExecuteRender();
 
-		//ブルームいろいろ
-		g_bloom.Render(renderContext,mainRenderTarget);
+		//レンダリングエンジンを実行
+		g_renderingEngine.Excute(renderContext);
 
 		// フレームの終了時に呼び出す必要がある処理を実行。
 		g_k2EngineLow->EndFrame();

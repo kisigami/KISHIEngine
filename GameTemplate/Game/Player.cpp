@@ -23,6 +23,7 @@ bool Player::Start()
 {
 	LoadAnimationClip();
 	m_modelRender.Init("Assets/modelData/unityChan2.tkm",m_animationClipArray, enAnimClip_Num, enModelUpAxisY);
+	//m_modelRender.Init("Assets/modelData/normalSample/sample.tkm");
 	
 	return true;
 }

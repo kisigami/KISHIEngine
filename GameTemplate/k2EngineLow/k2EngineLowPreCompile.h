@@ -79,6 +79,7 @@ using namespace Microsoft::WRL;
 #include "IRenderer.h"
 #include "ModelRender.h"
 #include "SceneLight.h"
+#include "RenderingEngine.h"
 #include "Bloom.h"
 #include "Monochrome.h"
 
