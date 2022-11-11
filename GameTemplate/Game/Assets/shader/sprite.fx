@@ -1,22 +1,30 @@
+
 cbuffer cb : register(b0)
 {
-    float4x4 mvp;       // MVP行列
-    float4 mulColor;    // 乗算カラー
+    float4x4 mvp;
+    float4 mulColor;
+};
+
+cbuffer DirectionLight : register(b1)
+{
+    float3 ligColor; // ライトのカラー
+    float3 ligDirection; // ライトの方向
 };
 
 struct VSInput
 {
     float4 pos : POSITION;
-    float2 uv  : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
 struct PSInput
 {
     float4 pos : SV_POSITION;
-    float2 uv  : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
-Texture2D<float4> colorTexture : register(t0); // カラーテクスチャ
+Texture2D<float4> albedoTexture : register(t0); // アルベド
+Texture2D<float4> normalTexture : register(t1); // 法線
 sampler Sampler : register(s0);
 
 PSInput VSMain(VSInput In)
@@ -29,9 +37,19 @@ PSInput VSMain(VSInput In)
 
 float4 PSMain(PSInput In) : SV_Target0
 {
-    float4 color = colorTexture.Sample(Sampler, In.uv);
+    // step-7 G-Bufferの内容を使ってライティング
+    float4 albedo = albedoTexture.Sample(Sampler, In.uv);
+    float3 normal = normalTexture.Sample(Sampler, In.uv).xyz;
+    normal = (normal * 2.0f) - 1.0f;
 
-    // step-3 ピクセルシェーダーから出力するαを変更する
+    // ライトを計算
+    float3 lig = 0.0f;
+    float t = max(0.0f, dot(normal, ligDirection) * -1.0f);
+    lig = ligColor * t;
+    float4 finalColor = albedo;
+    finalColor.xyz *= lig;
 
-    return color;
+    // スペキュラ強度を引っ張ってきて、スペキュラライトを計算する
+
+    return finalColor;
 }

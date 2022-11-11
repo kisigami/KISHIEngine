@@ -19,30 +19,40 @@ namespace  nsK2EngineLow {
 		int numAnimationClips,
 		EnModelUpAxis enModelUpAxis)
 	{
+		//モデルの初期化データを作成
 		ModelInitData initData;
-
+		//tkmファイルを指定
 		initData.m_tkmFilePath = filePath;
+		//fxファイルを指定
 		initData.m_fxFilePath = "Assets/shader/model.fx";
-
-		initData.m_expandConstantBuffer = &g_sceneLight;
-		initData.m_expandConstantBufferSize = sizeof(g_sceneLight);
+		//定数バッファを指定
+		initData.m_expandConstantBuffer = &g_renderingEngine.GetDeferredLightingCB();
+		//定数バッファのサイズを指定
+		initData.m_expandConstantBufferSize = sizeof(g_renderingEngine.GetDeferredLightingCB());
+		//カラーバッファのフォーマットを指定
 		initData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
+		//アニメーションクリップがあったら
 		if (animationClips == nullptr)
 		{
+			//頂点シェーダーのエントリーポイントを指定
 			initData.m_vsEntryPointFunc = "VSMain";
 		}
 		else
 		{
-			initData.m_vsSkinEntryPointFunc = "VSSkinMain";
-			InitSkeleton(filePath);
+			//スケルトンの指定
 			initData.m_skeleton = &m_skeleton;
+			//スキンありマテリアル用の頂点シェーダーを指定
+			initData.m_vsSkinEntryPointFunc = "VSSkinMain";
+			//スケルトンの初期化
+			InitSkeleton(filePath);
+			//アニメーションの初期化
 			InitAnimation(animationClips, numAnimationClips, enModelUpAxis);
 		}
-
+		//モデルの上方向を指定
 		initData.m_modelUpAxis = enModelUpAxis;
+		//モデル初期化データでモデルを初期化
 		m_model.Init(initData);
-		//Update();
 	}
 
 	void ModelRender::InitSkeleton(const char* filePath)
@@ -76,7 +86,7 @@ namespace  nsK2EngineLow {
 			m_skeleton.Update(m_model.GetWorldMatrix());
 		}
 	
-		m_animation.Progress(g_gameTime->GetFrameDeltaTime());
+		m_animation.Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
 	}
 
 	void ModelRender::Draw(RenderContext& rc)

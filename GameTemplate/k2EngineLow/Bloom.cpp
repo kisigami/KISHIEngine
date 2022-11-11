@@ -13,7 +13,7 @@ namespace nsK2EngineLow
 		InitGaussianBlur();
 		//ボケ画像加算合成スプライト初期化
 		InitPlusBokeSprite();
-		//メインレンダリングターゲットに描画された絵をフレームバッファにコピーするためのスプライトの初期化
+		//メインレンダリングターゲットに描画された絵をフレームバッファにコピーするためのスプライト初期化
 		InitCopyToFrameBufferSprite(mainRenderTarget);
 	}
 

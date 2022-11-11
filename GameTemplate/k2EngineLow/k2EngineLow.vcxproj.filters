@@ -232,6 +232,7 @@
     <ClCompile Include="SceneLight.cpp" />
     <ClCompile Include="Monochrome.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="ShadowMapRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -513,6 +514,7 @@
     <ClInclude Include="SceneLight.h" />
     <ClInclude Include="Monochrome.h" />
     <ClInclude Include="PostEffect.h" />
+    <ClInclude Include="ShadowMapRender.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">

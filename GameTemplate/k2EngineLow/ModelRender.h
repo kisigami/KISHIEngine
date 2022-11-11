@@ -47,6 +47,11 @@ namespace  nsK2EngineLow {
 			m_animationSpeed = animationSpeed;
 		}
 
+		const Matrix& GetWorldMatrix() const
+		{
+			return m_model.GetWorldMatrix();
+		}
+
 	private:
 		void InitSkeleton(const char* filePath);
 
@@ -55,6 +60,7 @@ namespace  nsK2EngineLow {
 			EnModelUpAxis enModelUpAxis);
 
 	private:
+		Matrix         m_worldMatrix;
 		AnimationClip* m_animationClips = nullptr;
 		Animation      m_animation;
 		int            m_numAnimationClips = 0;

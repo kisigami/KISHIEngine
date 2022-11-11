@@ -11,7 +11,7 @@ BackGround::~BackGround()
 
 bool BackGround::Start()
 {
-	m_modelRender.Init("Assets/modelData/bg/bg.tkm");
+	m_modelRender.Init("Assets/modelData/background/background.tkm");
 	m_modelRender.Update();
 	return true;
 }

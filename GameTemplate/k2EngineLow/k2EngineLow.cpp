@@ -91,6 +91,7 @@ namespace nsK2EngineLow {
 		// エフェクトエンジンの更新。
 		EffectEngine::GetInstance()->Update(g_gameTime->GetFrameDeltaTime());
 	}
+
 	/// <summary>
 	/// 描画処理を実行。
 	/// </summary>
@@ -99,7 +100,6 @@ namespace nsK2EngineLow {
 		auto& renderContext = g_graphicsEngine->GetRenderContext();
 		// ゲームオブジェクトマネージャーの描画処理を実行。
 		GameObjectManager::GetInstance()->ExecuteRender(renderContext);
-		
 	}
 
 	/// <summary>

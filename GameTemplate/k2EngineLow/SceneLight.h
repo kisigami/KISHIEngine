@@ -22,6 +22,7 @@ namespace nsK2EngineLow
 		Vector3 eyePos;                     //視点
 		float pad1;                         //パディング
 		Vector3 ambientLight;               //環境光
+		float pad2;
 	};
 
 	/// <summary>
@@ -40,6 +41,11 @@ namespace nsK2EngineLow
 		/// 更新
 		/// </summary>
 		void Update();
+
+		Light& GetSceneLight()
+		{
+			return m_light;
+		}
 
 		/// <summary>
 		/// ディレクションライトの方向の設定

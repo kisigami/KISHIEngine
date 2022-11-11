@@ -163,6 +163,11 @@ namespace nsK2EngineLow {
 			m_bones[boneNo]->SetLocalMatrix(m);
 		}
 
+		/*void SetBoneMatrix(int boneNo, const Matrix& m)
+		{
+			
+		}*/
+
 		/// <summary>
 		/// ƒ{[ƒ“‚Ì”‚ğæ“¾B
 		/// </summary>

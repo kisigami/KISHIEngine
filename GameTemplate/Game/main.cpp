@@ -17,7 +17,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	g_k2EngineLow = new K2EngineLow();
 	g_k2EngineLow->Init(g_hWnd, FRAME_BUFFER_W, FRAME_BUFFER_H);
 
-	//ライト初期化
 	g_sceneLight.Init();
 	//レンダリングエンジンの初期化
 	g_renderingEngine.Init();
@@ -32,18 +31,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	{
 		// フレームの開始時に呼び出す必要がある処理を実行
 		g_k2EngineLow->BeginFrame();
-
+	
 		//レンダリングターゲットの設定
-		g_renderingEngine.SetMainRenderTarget(renderContext);
+		//g_renderingEngine.SetMainRenderTarget(renderContext);
 
 		//更新処理
 		g_k2EngineLow->ExecuteUpdate();
 
-		//描画処理
 		g_k2EngineLow->ExecuteRender();
 
-		//レンダリングエンジンを実行
-		g_renderingEngine.Excute(renderContext);
+		//ポストエフェクト実行
+		//g_renderingEngine.Excute(renderContext);
 
 		// フレームの終了時に呼び出す必要がある処理を実行。
 		g_k2EngineLow->EndFrame();
