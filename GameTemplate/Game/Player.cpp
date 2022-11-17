@@ -116,143 +116,199 @@ void Player::CalcAngle()
 	}
 
 	m_angle = angle;
+	
+	//角度でグループ分け処理
 	ChoiceAngleGroup();
 }
 
 void Player::ChoiceAngleGroup()
 {
 	//後で治すので今は適当に
+
+	//スティックの入力が無かったら
 	if (g_pad[0]->GetRStickXF() == 0 &&
 		g_pad[0]->GetRStickYF() == 0)
 	{
 		m_angleGroup = enAngleGroup_No;
 	}
-
+	//0度から45度だったら
 	if (m_angle >= 0.0f && m_angle <= 45.0f)
+	{
+		m_angleGroup = enAngleGroup_0;
+	}
+	//45度から90度だったら
+	else if (m_angle > 45.0f && m_angle <= 90.0f)
 	{
 		m_angleGroup = enAngleGroup_1;
 	}
-
-	else if (m_angle > 45.0f && m_angle <= 90.0f)
+	//91度から135度だったら
+	else if (m_angle > 90.0f && m_angle <= 135.0f)
 	{
 		m_angleGroup = enAngleGroup_2;
 	}
-
-	else if (m_angle > 90.0f && m_angle <= 135.0f)
+	//136度から180度だったら
+	else if (m_angle > 135.0f && m_angle <= 180.0f)
 	{
 		m_angleGroup = enAngleGroup_3;
 	}
-
-	else if (m_angle > 135.0f && m_angle <= 180.0f)
+	//181度から225度だったら
+	else if (m_angle > 180.0f && m_angle <= 225.0f)
 	{
 		m_angleGroup = enAngleGroup_4;
 	}
-
-	else if (m_angle > 180.0f && m_angle <= 225.0f)
+	//226度から270度だったら
+	else if (m_angle > 225.0f && m_angle <= 270.0f)
 	{
 		m_angleGroup = enAngleGroup_5;
 	}
-
+	//271度から315度だったら
 	else if (m_angle > 270.0f && m_angle <= 315.0f)
 	{
 		m_angleGroup = enAngleGroup_6;
 	}
-
+	//316度から360度だったら
 	else if (m_angle > 315.0f && m_angle <= 360.0f)
 	{
 		m_angleGroup = enAngleGroup_7;
-		int a = 0;
+	}
+	
+	//スティックの入力があったら
+	if (g_pad[0]->GetRStickXF() != 0 ||
+		g_pad[0]->GetRStickYF() != 0)
+	{
+		//面積の計算処理
+		CalcArea();
 	}
 }
 
 void Player::CalcArea()
 {
-	Vector2 AxisR = { 0.0f,0.0f };
-	Vector2 AxisL = { 0.0f,0.0f };
+	//面積を計算するための軸を定義
+	Vector2 axis1 = { 0.0f,0.0f };
+	Vector2 axis2 = { 0.0f,0.0f };
 
 	switch (m_angleGroup)
 	{
+		//0度から45度の時
 	case Player::enAngleGroup_0:
-		AxisR = { 1.0f,0.0f };
-		AxisL = { 1.0f,1.0f };
+		//真右の軸
+		axis1 = { 1.0f,0.0f };
+		//右上の軸
+		axis2 = { 1.0f,1.0f };
 		break;
+		//46度から90度の時
 	case Player::enAngleGroup_1:
-		AxisR = { 1.0f,1.0f };
-		AxisL = { 0.0f,1.0f };
+		//右上の軸
+		axis1 = { 1.0f,1.0f };
+		//真上の軸
+		axis2 = { 0.0f,1.0f };
 		break;
+		//91度から135度の時
 	case Player::enAngleGroup_2:
-		AxisR = { 0.0f,1.0f };
-		AxisL = { -1.0f,1.0f };
+		//真上の軸
+		axis1 = { 0.0f,1.0f };
+		//左上の軸
+		axis2 = { -1.0f,1.0f };
 		break;
+		//135度から180度の時
 	case Player::enAngleGroup_3:
+		//左上の軸
+		axis1 = { -1.0f,1.0f };
+		//真左の軸
+		axis2 = { -1.0f,0.0f };
 		break;
+		//181度から225度の時
 	case Player::enAngleGroup_4:
+		//真左の軸
+		axis1 = { -1.0f,0.0f };
+		//左下の軸
+		axis2 = { -1.0f,-1.0f };
 		break;
+		//226度から270度の時
 	case Player::enAngleGroup_5:
+		//左下の軸
+		axis1 = { -1.0f,-1.0f };
+		//真下の軸
+		axis2 = { 0.0f,-1.0f };
 		break;
+		//271度から315度の時
 	case Player::enAngleGroup_6:
+		//真下の軸
+		axis1 = { 0.0f,-1.0f };
+		//右下の軸
+		axis2 = { 1.0f,-1.0f };
 		break;
+		//316度から360度の時
 	case Player::enAngleGroup_7:
+		//右下の軸
+		axis1 = { 1.0f,-1.0f };
+		//真右の軸
+		axis2 = { 1.0f,0.0f };
 		break;
+		//選択してないとき
 	case Player::enAngleGroup_No:
-		break;
-	default:
+		//何もしない
+		return;
 		break;
 	}
-	//45度から90度の入力の時
+
+	float angle = m_angle;
+
+	//S1の面積(右側の三角形)
+	axis1.Normalize();
+	Vector2 area1 = { 0.0f,0.0f };
+	area1.Cross(m_anglePos, axis1);
+	if (area1.x < 0.0f)
 	{
-		float angle = m_angle;
-		//S1の面積
-		Vector2 axis0 = { 1.0f,1.0f };
-		axis0.Normalize();
-		Vector2 d = {0.0f,0.0f};
-		d.Cross(axis0,m_anglePos);
-		d.x /= 2;
-		d.y /= 2;
-
-		//S2の面積
-		Vector2 axisX2 = { 0.0f,1.0f };
-		axisX2.Normalize();
-		Vector2 d2 = { 0.0f,0.0f };
-		d2.Cross(m_anglePos, axisX2);
-		if (d2.x < 0.0f)
-		{
-			d2.x *= -1;
-		}
-		d2.x /= 2;
-		if (d2.y < 0.0f)
-		{
-			d2.y *= -1;
-		}
-		d2.y /= 2;
-	
-		//S3の面積
-		Vector2 diff;
-		diff.x = axis0.x - m_anglePos.x;
-		diff.y = axis0.y - m_anglePos.y;
-
-		Vector2 diff2;
-		diff2.x = axisX2.x - m_anglePos.x;
-		diff2.y = axisX2.y - m_anglePos.y;
-
-		Vector2 d3;
-		d3.Cross(diff, diff2);
-		d3.x /= 2;
-		if (d3.x < 0.0f)
-		{
-			d3.x *= -1;
-		}
-		d3.y /= 2;
-		if (d3.y < 0.0f)
-		{
-			d3.y *= -1;
-		}
-
-		//Vector2 value;
-		//value.x = d.x + d2.x + d3.x;
-		//value.y = d.x + d2.y + d3.y;
-		int a = 0;
+		area1.x *= -1;
 	}
+	area1.x /= 2.0f;
+	if (area1.y < 0.0f)
+	{
+		area1.y *= -1;
+	}
+	area1.y /= 2.0f;
+
+	//S2の面積
+	axis2.Normalize();
+	Vector2 area2 = { 0.0f,0.0f };
+	area2.Cross(m_anglePos, axis2);
+	if (area2.x < 0.0f)
+	{
+		area2.x *= -1.0f;
+	}
+	area2.x /= 2.0f;
+	if (area2.y < 0.0f)
+	{
+		area2.y *= -1.0f;
+	}
+	area2.y /= 2.0f;
+
+	//S3の面積
+	Vector2 diff;
+	diff.x = axis1.x - m_anglePos.x;
+	diff.y = axis1.y - m_anglePos.y;
+
+	Vector2 diff2;
+	diff2.x = axis2.x - m_anglePos.x;
+	diff2.y = axis2.y - m_anglePos.y;
+
+	Vector2 area3;
+	area3.Cross(diff, diff2);
+	if (area3.x < 0.0f)
+	{
+		area3.x *= -1;
+	}
+	area3.x /= 2;
+
+	if (area3.y < 0.0f)
+	{
+		area3.y *= -1;
+	}
+	area3.y /= 2;
+
+	//ブレイクポイントつける
+	int a = 0;
 }
 
 void Player::CalcSkeleton()
