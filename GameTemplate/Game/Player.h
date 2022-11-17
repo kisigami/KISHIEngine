@@ -39,7 +39,26 @@ private:
 	void ProcessWalkStateTransition();
 	void ProcessCastStateTransition();
 	void ProcessReadyCastStateTransition();
+
 	void CalcSkeleton();
+	void CalcAngle();
+	void ChoiceAngleGroup();
+	void CalcArea();
+
+	//角度をグループ分けしたい
+	enum EnAngleGroup
+	{
+		enAngleGroup_0, //0度から45度
+		enAngleGroup_1, //46度から90度
+		enAngleGroup_2, //91度から135度
+		enAngleGroup_3, //136度から180度
+		enAngleGroup_4, //181度から225度
+		enAngleGroup_5, //226度から270度
+		enAngleGroup_6, //271度から315度
+		enAngleGroup_7,  //316度から360度
+		enAngleGroup_No
+	};
+	EnAngleGroup m_angleGroup = enAngleGroup_No;
 
 	enum EnAnimationClip
 	{
@@ -81,8 +100,16 @@ private:
 		enTargetClip_Normal,
 		enTargetClip_Up,
 		enTargetClip_UpRight,
+		enTargetClip_Right,
+		enTargetClip_DownRight,
+		enTargetClip_Down,
+		enTargetClip_DownLeft,
+		enTargetClip_Left,
+		enTargetClip_UpLeft,
 		enTargetClip_Num
 	};
 	AnimationClip targetClipArray[enTargetClip_Num];
+	Vector2 m_anglePos;
+	float m_angle;
 };
 

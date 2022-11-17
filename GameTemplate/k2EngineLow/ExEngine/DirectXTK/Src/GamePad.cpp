@@ -13,6 +13,9 @@
 #include "GamePad.h"
 #include "PlatformHelpers.h"
 
+#include "dinput.h"
+//#include "dinputex.h"
+
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
@@ -65,7 +68,7 @@ namespace
                 resultY = std::max(-1.f, std::min(y * scale, 1.f));
             }
             break;
-
+ 
             default: // GamePad::DEAD_ZONE_NONE
                 resultX = ApplyLinearDeadZone(x, maxValue, 0);
                 resultY = ApplyLinearDeadZone(y, maxValue, 0);

@@ -9,6 +9,11 @@ namespace nsK2EngineLow
 	class RenderingEngine
 	{
 	public:
+
+		void AddRenderObject(IRenderer* renderObject)
+		{
+			m_renderObjects.push_back(renderObject);
+		}
 		struct SDeferredLightingCB
 		{
 			Light m_light;              // ライト
@@ -48,6 +53,7 @@ namespace nsK2EngineLow
 		RenderTarget m_normalRenderTarget;
 		Sprite m_diferredLightingSprite;
 		PostEffect m_postEffect;          //ポストエフェクト
+		std::vector< IRenderer* > m_renderObjects;                      // 描画オブジェクトのリスト。
 	};
 
 	//グローバル

@@ -84,17 +84,180 @@ bool Player::Start()
 	return true;
 }
 
+void Player::CalcAngle()
+{
+	Vector2 originPosition = Vector2::Zero;
+	Vector2 angleposition = Vector2::Zero;
+	angleposition.y = g_pad[0]->GetRStickYF();
+	angleposition.x = g_pad[0]->GetRStickXF();
+
+	
+	//X軸のベクトル。
+	Vector2 axisX = { 1.0f,0.0f };
+	//正規化（長さを１に）
+	axisX.Normalize();
+
+	//射影。
+	float dot = angleposition.Dot(axisX);
+
+	m_anglePos = angleposition;
+
+	//cos値を求める。
+	float angleCos = dot / angleposition.Length();
+	
+	//入力角度を求める。
+	float angle = acos(angleCos);
+	angle = Math::RadToDeg(angle);
+	
+	//入力方向がしためだったら判定角度を反転。
+	if (angleposition.y < 0) 
+	{
+		angle = 360.0f - angle;
+	}
+
+	m_angle = angle;
+	ChoiceAngleGroup();
+}
+
+void Player::ChoiceAngleGroup()
+{
+	//後で治すので今は適当に
+	if (g_pad[0]->GetRStickXF() == 0 &&
+		g_pad[0]->GetRStickYF() == 0)
+	{
+		m_angleGroup = enAngleGroup_No;
+	}
+
+	if (m_angle >= 0.0f && m_angle <= 45.0f)
+	{
+		m_angleGroup = enAngleGroup_1;
+	}
+
+	else if (m_angle > 45.0f && m_angle <= 90.0f)
+	{
+		m_angleGroup = enAngleGroup_2;
+	}
+
+	else if (m_angle > 90.0f && m_angle <= 135.0f)
+	{
+		m_angleGroup = enAngleGroup_3;
+	}
+
+	else if (m_angle > 135.0f && m_angle <= 180.0f)
+	{
+		m_angleGroup = enAngleGroup_4;
+	}
+
+	else if (m_angle > 180.0f && m_angle <= 225.0f)
+	{
+		m_angleGroup = enAngleGroup_5;
+	}
+
+	else if (m_angle > 270.0f && m_angle <= 315.0f)
+	{
+		m_angleGroup = enAngleGroup_6;
+	}
+
+	else if (m_angle > 315.0f && m_angle <= 360.0f)
+	{
+		m_angleGroup = enAngleGroup_7;
+		int a = 0;
+	}
+}
+
+void Player::CalcArea()
+{
+	Vector2 AxisR = { 0.0f,0.0f };
+	Vector2 AxisL = { 0.0f,0.0f };
+
+	switch (m_angleGroup)
+	{
+	case Player::enAngleGroup_0:
+		AxisR = { 1.0f,0.0f };
+		AxisL = { 1.0f,1.0f };
+		break;
+	case Player::enAngleGroup_1:
+		AxisR = { 1.0f,1.0f };
+		AxisL = { 0.0f,1.0f };
+		break;
+	case Player::enAngleGroup_2:
+		AxisR = { 0.0f,1.0f };
+		AxisL = { -1.0f,1.0f };
+		break;
+	case Player::enAngleGroup_3:
+		break;
+	case Player::enAngleGroup_4:
+		break;
+	case Player::enAngleGroup_5:
+		break;
+	case Player::enAngleGroup_6:
+		break;
+	case Player::enAngleGroup_7:
+		break;
+	case Player::enAngleGroup_No:
+		break;
+	default:
+		break;
+	}
+	//45度から90度の入力の時
+	{
+		float angle = m_angle;
+		//S1の面積
+		Vector2 axis0 = { 1.0f,1.0f };
+		axis0.Normalize();
+		Vector2 d = {0.0f,0.0f};
+		d.Cross(axis0,m_anglePos);
+		d.x /= 2;
+		d.y /= 2;
+
+		//S2の面積
+		Vector2 axisX2 = { 0.0f,1.0f };
+		axisX2.Normalize();
+		Vector2 d2 = { 0.0f,0.0f };
+		d2.Cross(m_anglePos, axisX2);
+		if (d2.x < 0.0f)
+		{
+			d2.x *= -1;
+		}
+		d2.x /= 2;
+		if (d2.y < 0.0f)
+		{
+			d2.y *= -1;
+		}
+		d2.y /= 2;
+	
+		//S3の面積
+		Vector2 diff;
+		diff.x = axis0.x - m_anglePos.x;
+		diff.y = axis0.y - m_anglePos.y;
+
+		Vector2 diff2;
+		diff2.x = axisX2.x - m_anglePos.x;
+		diff2.y = axisX2.y - m_anglePos.y;
+
+		Vector2 d3;
+		d3.Cross(diff, diff2);
+		d3.x /= 2;
+		if (d3.x < 0.0f)
+		{
+			d3.x *= -1;
+		}
+		d3.y /= 2;
+		if (d3.y < 0.0f)
+		{
+			d3.y *= -1;
+		}
+
+		//Vector2 value;
+		//value.x = d.x + d2.x + d3.x;
+		//value.y = d.x + d2.y + d3.y;
+		int a = 0;
+	}
+}
+
 void Player::CalcSkeleton()
 {
-	//計算用のアニメーション再生
-	calcAnim[0].Play(enTargetClip_Normal);
-	calcAnim[1].Play(enTargetClip_Up);
-	calcAnim[2].Play(enTargetClip_UpRight);
-
-	calcAnim[0].Progress(1/60.0f);
-	calcAnim[1].Progress(1/60.0f);
-	calcAnim[2].Progress(1/60.0f);
-
+    
 	//重さ仮の数値
 	float brendWeight[3];
 	brendWeight[0] = 0.33f;
@@ -212,9 +375,12 @@ void Player::CalcSkeleton()
 
 void Player::Update()
 {
+
 	//モーションブレンディング
 	CalcSkeleton();
-	
+	CalcAngle();
+
+
 	//本物
 	//model.UpdateWorldMatrix(m_position,m_rotation,m_scale);
 	skeleton.Update(model.GetWorldMatrix());
@@ -388,4 +554,5 @@ void Player::Render(RenderContext& rc)
 	model.Draw(rc);
 	//モデルの描画
 	m_modelRender.Draw(rc);
+
 }

@@ -60,6 +60,46 @@ namespace nsK2EngineLow {
 			x = v0.x + (v1.x - v0.x) * t;
 			y = v0.y + (v1.y - v0.y) * t;
 		}
+
+		void Normalize()
+		{
+			DirectX::XMVECTOR xmv = DirectX::XMLoadFloat2(&vec);
+			xmv = DirectX::XMVector2Normalize(xmv);
+			DirectX::XMStoreFloat2(&vec, xmv);
+		}
+
+		void Cross(const Vector2& v0, const Vector2& v1)
+		{
+			DirectX::XMVECTOR xmv0 = DirectX::XMLoadFloat2(&v0.vec);
+			DirectX::XMVECTOR xmv1 = DirectX::XMLoadFloat2(&v1.vec);
+			DirectX::XMVECTOR xmvr = DirectX::XMVector2Cross(xmv0, xmv1);
+			DirectX::XMStoreFloat2(&vec, xmvr);
+		}
+
+		/// <summary>
+		/// ベクトルの長さを取得
+		/// </summary>
+		float Length() const
+		{
+			DirectX::XMVECTOR xmv = DirectX::XMLoadFloat2(&vec);
+			return DirectX::XMVector2Length(xmv).m128_f32[0];
+		}
+
+		float Dot(const Vector2& _v) const
+		{
+			DirectX::XMVECTOR xmv0 = DirectX::XMLoadFloat2(&vec);
+			DirectX::XMVECTOR xmv1 = DirectX::XMLoadFloat2(&_v.vec);
+			return DirectX::XMVector2Dot(xmv0, xmv1).m128_f32[0];
+		}
+
+	/*	void Cross(const Vector2& _v)
+		{
+			DirectX::XMVECTOR xmv0 = DirectX::XMLoadFloat2(&vec);
+			DirectX::XMVECTOR xmv1 = DirectX::XMLoadFloat2(&_v.vec);
+			DirectX::XMVECTOR xmvr = DirectX::XMVector2Cross(xmv0, xmv1);
+			DirectX::XMStoreFloat2(&vec, xmvr);
+		}*/
+
 	};
 	/// <summary>
 	/// 3次元ベクトル。
@@ -266,6 +306,7 @@ namespace nsK2EngineLow {
 			DirectX::XMVECTOR xmvr = DirectX::XMVector3Cross(xmv0, xmv1);
 			DirectX::XMStoreFloat3(&vec, xmvr);
 		}
+
 		/// <summary>
 		/// ベクトルの長さを取得
 		/// </summary>

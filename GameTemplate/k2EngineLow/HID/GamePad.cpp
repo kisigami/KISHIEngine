@@ -137,7 +137,7 @@ namespace nsK2EngineLow {
 
 			// “ü—Í—Ê‚ð³‹K‰»‚·‚éB
 			float t = sqrtf(m_lStickX * m_lStickX + m_lStickY * m_lStickY);
-			if (t > 0.001f) {
+			if (t > 1.0f) {
 				m_lStickX /= t;
 				m_lStickY /= t;
 			}
@@ -169,7 +169,7 @@ namespace nsK2EngineLow {
 			}
 			// “ü—Í—Ê‚ð³‹K‰»‚·‚éB
 			float t = sqrtf(m_rStickX * m_rStickX + m_rStickY * m_rStickY);
-			if (t > 0.001f) {
+			if (t > 1.0f) {
 				m_rStickX /= t;
 				m_rStickY /= t;
 			}
