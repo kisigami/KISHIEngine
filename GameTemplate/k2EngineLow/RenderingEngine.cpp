@@ -9,9 +9,9 @@ namespace nsK2EngineLow
 	{
 		m_deferredLightingCB.m_light = g_sceneLight.GetSceneLight();
 		//メインレンダリングターゲットの初期化
-		InitMainRenderTarget();
+		//InitMainRenderTarget();
 		//ポストエフェクトの初期化
-		m_postEffect.Init(m_mainRenderTarget);
+		//m_postEffect.Init(m_mainRenderTarget);
 	}
 
 	void RenderingEngine::Excute(RenderContext& rc)
@@ -21,6 +21,43 @@ namespace nsK2EngineLow
 
 		//ポストエフェクトの描画
 		m_postEffect.Render(rc,m_mainRenderTarget);
+
+	}
+
+	void RenderingEngine::Render2D(RenderContext& rc)
+	{
+		BeginGPUEvent("Render2D");
+		// レンダリングターゲットとして利用できるまで待つ。
+		//PRESENTからRENDERTARGETへ。
+		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
+
+		// レンダリングターゲットを設定
+		rc.SetRenderTargetAndViewport(m_2DRenderTarget);
+
+		// レンダリングターゲットをクリア
+		rc.ClearRenderTargetView(m_2DRenderTarget);
+
+		m_mainSprite.Draw(rc);
+
+		for (auto& renderObj : m_renderObjects)
+		{
+			//renderObj->OnRender2D(rc);
+		}
+
+		//RENDERTARGETからPRESENTへ。
+		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
+		//PRESENTからRENDERTARGETへ。
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+
+		// レンダリングターゲットを設定
+		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+
+		m_2DSprite.Draw(rc);
+
+		//RENDERTARGETからPRESENTへ。
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		EndGPUEvent();
 	}
 
 	void RenderingEngine::InitMainRenderTarget()

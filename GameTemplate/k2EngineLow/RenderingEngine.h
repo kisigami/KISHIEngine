@@ -9,6 +9,7 @@ namespace nsK2EngineLow
 	class RenderingEngine
 	{
 	public:
+		void Render2D(RenderContext& rc);
 
 		void AddRenderObject(IRenderer* renderObject)
 		{
@@ -45,12 +46,16 @@ namespace nsK2EngineLow
 		/// </summary>
 		/// <param name="rc">レンダリングコンテキスト</param>
 		void SetMainRenderTarget(RenderContext& rc);
+	
 
 	private:
+		Sprite m_mainSprite;
+		Sprite m_2DSprite;
 		SDeferredLightingCB m_deferredLightingCB;
 		RenderTarget m_mainRenderTarget;  //メインレンダリングターゲット
 		RenderTarget m_albedRenderTarget;
 		RenderTarget m_normalRenderTarget;
+		RenderTarget m_2DRenderTarget;
 		Sprite m_diferredLightingSprite;
 		PostEffect m_postEffect;          //ポストエフェクト
 		std::vector< IRenderer* > m_renderObjects;                      // 描画オブジェクトのリスト。

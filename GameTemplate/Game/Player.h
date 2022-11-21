@@ -70,6 +70,7 @@ private:
 	};
 
 private:
+	FontRender m_fontRender;
 	EnPlayerState m_playerState = enPlayerState_Idle;
 	CharacterController m_charaCon;
 	ModelRender         m_modelRender;

@@ -31,14 +31,32 @@ void Player::LoadAnimationClip()
 
 	//ターゲットモーションのクリップを初期化する
 	//真ん中のターゲットモーション
-	targetClipArray[enTargetClip_Normal].Load("Assets/animData/player/rod0.tka");
+	targetClipArray[enTargetClip_Normal].Load("Assets/animData/player/rodnormal.tka");
 	targetClipArray[enTargetClip_Normal].SetLoopFlag(false);
 	//上のターゲットモーション
-	targetClipArray[enTargetClip_Up].Load("Assets/animData/player/rod1.tka");
+	targetClipArray[enTargetClip_Up].Load("Assets/animData/player/rodup.tka");
 	targetClipArray[enTargetClip_Up].SetLoopFlag(false);
 	//右上のターゲットモーション
-	targetClipArray[enTargetClip_UpRight].Load("Assets/animData/player/rod2.tka");
+	targetClipArray[enTargetClip_UpRight].Load("Assets/animData/player/rodupright.tka");
 	targetClipArray[enTargetClip_UpRight].SetLoopFlag(false);
+	//右のターゲットモーション
+	targetClipArray[enTargetClip_Right].Load("Assets/animData/player/rodright.tka");
+	targetClipArray[enTargetClip_Right].SetLoopFlag(false);
+	//右下のターゲットモーション
+	targetClipArray[enTargetClip_DownRight].Load("Assets/animData/player/roddownright.tka");
+	targetClipArray[enTargetClip_DownRight].SetLoopFlag(false);
+	//下のターゲットモーション
+	targetClipArray[enTargetClip_Down].Load("Assets/animData/player/roddown.tka");
+	targetClipArray[enTargetClip_Down].SetLoopFlag(false);
+	//左下のターゲットモーション
+	targetClipArray[enTargetClip_DownLeft].Load("Assets/animData/player/roddownleft.tka");
+	targetClipArray[enTargetClip_DownLeft].SetLoopFlag(false);
+	//左のターゲットモーション
+	targetClipArray[enTargetClip_Left].Load("Assets/animData/player/rodleft.tka");
+	targetClipArray[enTargetClip_Left].SetLoopFlag(false);
+	//左上のターゲットモーション
+	targetClipArray[enTargetClip_UpLeft].Load("Assets/animData/player/rodupleft.tka");
+	targetClipArray[enTargetClip_UpLeft].SetLoopFlag(false);
 
 	//計算用のアニメーションを初期化する
 	for (int i = 0; i < 3; i++)
@@ -91,7 +109,18 @@ void Player::CalcAngle()
 	angleposition.y = g_pad[0]->GetRStickYF();
 	angleposition.x = g_pad[0]->GetRStickXF();
 
-	
+	if (angleposition.x >= 0.7f) {
+		angleposition.x = 0.7f;
+	}
+	if (angleposition.y >= 0.7f) {
+		angleposition.y = 0.7f;
+	}
+	if (angleposition.x <= -0.7f) {
+		angleposition.x = -0.7f;
+	}
+	if (angleposition.y <= -0.7f) {
+		angleposition.y = -0.7f;
+	}
 	//X軸のベクトル。
 	Vector2 axisX = { 1.0f,0.0f };
 	//正規化（長さを１に）
@@ -284,31 +313,15 @@ void Player::CalcArea()
 	}
 	area2.y /= 2.0f;
 
-	//S3の面積
-	Vector2 diff;
-	diff.x = axis1.x - m_anglePos.x;
-	diff.y = axis1.y - m_anglePos.y;
-
-	Vector2 diff2;
-	diff2.x = axis2.x - m_anglePos.x;
-	diff2.y = axis2.y - m_anglePos.y;
-
+	
+	const Vector2 goukei = { 0.3535544845f,0.3535544845f};
+	
 	Vector2 area3;
-	area3.Cross(diff, diff2);
-	if (area3.x < 0.0f)
-	{
-		area3.x *= -1;
-	}
-	area3.x /= 2;
-
-	if (area3.y < 0.0f)
-	{
-		area3.y *= -1;
-	}
-	area3.y /= 2;
+	area3.x = goukei.x - (area1.x + area2.x);
+	area3.y = goukei.y - (area1.y + area2.y);
 
 	//ブレイクポイントつける
-	int a = 0;
+    int a = 0;
 }
 
 void Player::CalcSkeleton()
@@ -426,11 +439,20 @@ void Player::CalcSkeleton()
 		//ボーンを設定
 		skeleton.SetBoneLocalMatrix(boneNo, boneMat);
 	}
-	
 }
 
 void Player::Update()
 {
+
+	wchar_t text[256];
+	float m_timer = 0.0f;
+	int minute = (int)m_timer / 60;
+	int sec = (int)m_timer % 60;
+	swprintf_s(text, 256, L"%02d:%02d", minute, sec);
+	m_fontRender.SetText(text);
+	m_fontRender.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+	m_fontRender.SetScale(2.3f);
+	m_fontRender.SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 
 	//モーションブレンディング
 	CalcSkeleton();
@@ -610,5 +632,5 @@ void Player::Render(RenderContext& rc)
 	model.Draw(rc);
 	//モデルの描画
 	m_modelRender.Draw(rc);
-
+	m_fontRender.Draw(rc);
 }
