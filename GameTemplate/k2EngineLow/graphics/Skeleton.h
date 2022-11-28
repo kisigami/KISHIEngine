@@ -167,7 +167,7 @@ namespace nsK2EngineLow {
 		{
 			
 		}*/
-
+		
 		/// <summary>
 		/// ボーンの数を取得。
 		/// </summary>
@@ -227,6 +227,20 @@ namespace nsK2EngineLow {
 		Matrix* GetBoneMatricesTopAddress() const
 		{
 			return m_boneMatrixs.get();
+		}
+		/// <summary>
+		/// ボーン行列を設定
+		/// </summary>
+		void SetBoneMatrix(int boneNo,Matrix& matrix)
+		{
+			m_boneMatrixs[boneNo] = matrix;
+		}
+		/// <summary>
+		/// ボーン行列を取得
+		/// </summary>
+		Matrix& GetBoneMatrix(int boneNo) const
+		{
+			return m_boneMatrixs[boneNo];
 		}
 		/// <summary>
 		/// アニメーションが再生されているマークを付ける。

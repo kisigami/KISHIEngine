@@ -109,8 +109,13 @@ private:
 		enTargetClip_UpLeft,
 		enTargetClip_Num
 	};
+
 	AnimationClip targetClipArray[enTargetClip_Num];
 	Vector2 m_anglePos;
 	float m_angle;
+	float m_area1;
+	float m_area2;
+	float m_area3;
+	Vector2 m_allArea;
 };
 

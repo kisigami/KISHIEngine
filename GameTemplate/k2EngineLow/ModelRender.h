@@ -51,6 +51,14 @@ namespace  nsK2EngineLow {
 		{
 			return m_model.GetWorldMatrix();
 		}
+		
+		void CopySkeleton(Skeleton& skeleton)
+		{
+			for (int boneNo = 0; boneNo < m_skeleton.GetNumBones(); boneNo++)
+			{
+				m_skeleton.SetBoneMatrix(boneNo, skeleton.GetBoneMatrix(boneNo));
+			}
+		}
 
 	private:
 		void InitSkeleton(const char* filePath);

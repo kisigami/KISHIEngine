@@ -106,21 +106,27 @@ void Player::CalcAngle()
 {
 	Vector2 originPosition = Vector2::Zero;
 	Vector2 angleposition = Vector2::Zero;
+
 	angleposition.y = g_pad[0]->GetRStickYF();
 	angleposition.x = g_pad[0]->GetRStickXF();
 
-	if (angleposition.x >= 0.7f) {
+	/*if (angleposition.x >= 0.7)
+	{
 		angleposition.x = 0.7f;
 	}
-	if (angleposition.y >= 0.7f) {
+	if (angleposition.y >= 0.7)
+	{
 		angleposition.y = 0.7f;
 	}
-	if (angleposition.x <= -0.7f) {
+	if (angleposition.x <= -0.7)
+	{
 		angleposition.x = -0.7f;
 	}
-	if (angleposition.y <= -0.7f) {
+	if (angleposition.y <= -0.7)
+	{
 		angleposition.y = -0.7f;
-	}
+	}*/
+
 	//X軸のベクトル。
 	Vector2 axisX = { 1.0f,0.0f };
 	//正規化（長さを１に）
@@ -216,6 +222,7 @@ void Player::CalcArea()
 	Vector2 axis1 = { 0.0f,0.0f };
 	Vector2 axis2 = { 0.0f,0.0f };
 
+	//面積を計算するための軸を選択
 	switch (m_angleGroup)
 	{
 		//0度から45度の時
@@ -314,24 +321,106 @@ void Player::CalcArea()
 	area2.y /= 2.0f;
 
 	
-	const Vector2 goukei = { 0.3535544845f,0.3535544845f};
-	
+	//const Vector2 goukei = { 0.3535544845f,0.3535544845f};
+	//Vector2 area3;
+	//area3.x = goukei.x - (area1.x + area2.x);
+	//area3.y = goukei.y - (area1.y + area2.y);
+
+	Vector2 diff;
+	diff.x = axis1.x - m_anglePos.x;
+	diff.y = axis1.y - m_anglePos.y;
+
+	Vector2 diff2;
+	diff2.x = axis2.x - m_anglePos.x;
+	diff2.y = axis2.y - m_anglePos.y;
+
 	Vector2 area3;
-	area3.x = goukei.x - (area1.x + area2.x);
-	area3.y = goukei.y - (area1.y + area2.y);
+	area3.Cross(diff, diff2);
+	if (area3.x < 0.0f)
+	{
+		area3.x *= -1;
+	}
+	area3.x /= 2;
+
+	if (area3.y < 0.0f)
+	{
+		area3.y *= -1;
+	}
+	area3.y /= 2;
+
+	float allarea;
+	allarea = area1.x + area2.x + area3.x;
+	m_area1 = area1.x / allarea;
+	m_area2 = area2.x / allarea;
+	m_area3 = area3.x / allarea;
+
 
 	//ブレイクポイントつける
     int a = 0;
+
+	//モーションブレンディング
+	CalcSkeleton();
 }
 
 void Player::CalcSkeleton()
 {
-    
+    //グループで再生するアニメーション分ける
+	switch (m_angleGroup)
+	{
+	case Player::enAngleGroup_0:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Right);
+		calcAnim[2].Play(enTargetClip_UpRight);
+		break;
+	case Player::enAngleGroup_1:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_UpRight);
+		calcAnim[2].Play(enTargetClip_Up);
+		break;
+	case Player::enAngleGroup_2:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Up);
+		calcAnim[2].Play(enTargetClip_UpLeft);
+		break;
+	case Player::enAngleGroup_3:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_UpLeft);
+		calcAnim[2].Play(enTargetClip_Left);
+		break;
+	case Player::enAngleGroup_4:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Left);
+		calcAnim[2].Play(enTargetClip_DownLeft);
+		break;
+	case Player::enAngleGroup_5:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_DownLeft);
+		calcAnim[2].Play(enTargetClip_Down);
+		break;
+	case Player::enAngleGroup_6:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Down);
+		calcAnim[2].Play(enTargetClip_DownRight);
+		break;
+	case Player::enAngleGroup_7:
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_DownRight);
+		calcAnim[2].Play(enTargetClip_Right);
+		break;
+	case Player::enAngleGroup_No:
+		return;
+		break;
+	}
+
+	calcAnim[0].Progress(1 / 60.0f);
+	calcAnim[1].Progress(1 / 60.0f);
+	calcAnim[2].Progress(1 / 60.0f);
+
 	//重さ仮の数値
 	float brendWeight[3];
-	brendWeight[0] = 0.33f;
-	brendWeight[1] = 0.33f;
-	brendWeight[2] = 0.33f;
+	brendWeight[0] = m_area3;
+	brendWeight[1] = m_area2;
+	brendWeight[2] = m_area1;
 
 	//最終ボーン計算
 	std::unique_ptr<Matrix[]> boneMatrices;
@@ -341,7 +430,7 @@ void Player::CalcSkeleton()
 	{
 		Matrix boneMat;
 		//1個目のスケルトンのボーン行列を取得
-		boneMat = calcSkeleton[0].GetBoneMatricesTopAddress()[boneNo];
+		boneMat = calcSkeleton[0].GetBone(boneNo)->GetLocalMatrix();
 		//ボーン行列×三角形の重さ
 		boneMat.m[0][0] *= brendWeight[0];
 		boneMat.m[0][1] *= brendWeight[0];
@@ -365,7 +454,7 @@ void Player::CalcSkeleton()
 
 		Matrix boneMat1;
 		//２個目のボーン行列を取得
-		boneMat1 = calcSkeleton[1].GetBoneMatricesTopAddress()[boneNo];
+		boneMat1 = calcSkeleton[1].GetBone(boneNo)->GetLocalMatrix();
 
 		boneMat1.m[0][0] *= brendWeight[1];
 		boneMat1.m[0][1] *= brendWeight[1];
@@ -389,7 +478,7 @@ void Player::CalcSkeleton()
 
 		Matrix boneMat2;
 		//3個目のボーン行列を取得
-		boneMat2 = calcSkeleton[2].GetBoneMatricesTopAddress()[boneNo];
+		boneMat2 = calcSkeleton[2].GetBone(boneNo)->GetLocalMatrix();
 
 		boneMat2.m[0][0] *= brendWeight[2];
 		boneMat2.m[0][1] *= brendWeight[2];
@@ -436,33 +525,22 @@ void Player::CalcSkeleton()
 		//boneMat += calcSkeleton[1].GetBoneMatricesTopAddress()[boneNo] * brendWeight[1];
 		//boneMat += calcSkeleton[2].GetBoneMatricesTopAddress()[boneNo] * brendWeight[2];
 
-		//ボーンを設定
 		skeleton.SetBoneLocalMatrix(boneNo, boneMat);
 	}
 }
 
 void Player::Update()
 {
-
-	wchar_t text[256];
-	float m_timer = 0.0f;
-	int minute = (int)m_timer / 60;
-	int sec = (int)m_timer % 60;
-	swprintf_s(text, 256, L"%02d:%02d", minute, sec);
-	m_fontRender.SetText(text);
-	m_fontRender.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-	m_fontRender.SetScale(2.3f);
-	m_fontRender.SetColor(Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-
-	//モーションブレンディング
-	CalcSkeleton();
 	CalcAngle();
-
-
+	
+	
 	//本物
-	//model.UpdateWorldMatrix(m_position,m_rotation,m_scale);
-	skeleton.Update(model.GetWorldMatrix());
-	anim.Progress(g_gameTime->GetFrameDeltaTime() * 1.0f);
+	Vector3 pos = m_position;
+	pos.z += 50.0f;
+
+	skeleton.SetMarkPlayAnimation();
+	skeleton.Update(m_modelRender.GetWorldMatrix());
+	//anim.Progress(g_gameTime->GetFrameDeltaTime() * 1.0f);
 
 	//移動処理
 	Move();
@@ -475,6 +553,7 @@ void Player::Update()
 
 	//モデルの更新
 	m_modelRender.Update();
+	m_modelRender.CopySkeleton(skeleton);
 }
 
 void Player::Move()
@@ -629,7 +708,7 @@ void Player::ProcessReadyCastStateTransition()
 void Player::Render(RenderContext& rc)
 {
 	//本物の描画
-	model.Draw(rc);
+	// model.Draw(rc);
 	//モデルの描画
 	m_modelRender.Draw(rc);
 	m_fontRender.Draw(rc);
