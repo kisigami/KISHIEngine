@@ -27,11 +27,12 @@ void GameCamera::Update()
 {
 	//注視点を計算する。
 	m_targetPosition = m_player->GetPosition();
+	m_targetPosition.z += 1000.0f;
 
 	//視点を計算する
 	m_cameraPosition = m_player->GetPosition();
 	m_cameraPosition.y += CAMERA_HEIGHT_POSITION;
-	 
+
 	//変数に注視点から視点までのベクトルを代入
 	Vector3 toCameraPosOld = m_toCameraPos;
 
@@ -39,31 +40,35 @@ void GameCamera::Update()
 	float x = g_pad[0]->GetRStickXF();
 	float y = g_pad[0]->GetRStickYF();
 
-	//Y軸周りの回転
-	Quaternion qRot;
-	qRot.SetRotationDeg(Vector3::AxisY, ROTATION_SPEED_X * x);
-	qRot.Apply(m_toCameraPos);
-	//X軸周りの回転。
-	Vector3 axisX;
-	axisX.Cross(Vector3::AxisY, m_toCameraPos);
-	axisX.Normalize();
-	qRot.SetRotationDeg(axisX, ROTATION_SPEED_Y * y);
-	qRot.Apply(m_toCameraPos);
-	//カメラの回転の上限をチェックする。
-	//注視点から視点までのベクトルを正規化する。
-	//正規化すると、ベクトルの大きさが１になる。
-	//大きさが１になるということは、ベクトルから強さがなくなり、方向のみの情報となるということ。
-	Vector3 toPosDir = m_toCameraPos;
-	toPosDir.Normalize();
-	if (toPosDir.y < DOWN_MAX_POS)
+	//釣れたらカメラ固定
+	if (m_player->GetState() != m_player->enPlayerState_Fishing)
 	{
-		//カメラが下向きすぎ
-		m_toCameraPos = toCameraPosOld;
-	}
-	else if (toPosDir.y > UP_MAX_POS)
-	{
-		//カメラが上向きすぎ
-		m_toCameraPos = toCameraPosOld;
+		//Y軸周りの回転
+		Quaternion qRot;
+		qRot.SetRotationDeg(Vector3::AxisY, ROTATION_SPEED_X * x);
+		qRot.Apply(m_toCameraPos);
+		//X軸周りの回転。
+		Vector3 axisX;
+		axisX.Cross(Vector3::AxisY, m_toCameraPos);
+		axisX.Normalize();
+		qRot.SetRotationDeg(axisX, ROTATION_SPEED_Y * y);
+		qRot.Apply(m_toCameraPos);
+		//カメラの回転の上限をチェックする。
+		//注視点から視点までのベクトルを正規化する。
+		//正規化すると、ベクトルの大きさが１になる。
+		//大きさが１になるということは、ベクトルから強さがなくなり、方向のみの情報となるということ。
+		Vector3 toPosDir = m_toCameraPos;
+		toPosDir.Normalize();
+		if (toPosDir.y < DOWN_MAX_POS)
+		{
+			//カメラが下向きすぎ
+			m_toCameraPos = toCameraPosOld;
+		}
+		else if (toPosDir.y > UP_MAX_POS)
+		{
+			//カメラが上向きすぎ
+			m_toCameraPos = toCameraPosOld;
+		}
 	}
 
 	//注視点を計算する

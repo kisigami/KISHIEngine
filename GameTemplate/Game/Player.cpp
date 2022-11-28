@@ -28,6 +28,8 @@ void Player::LoadAnimationClip()
 	m_animationClipArray[enAnimClip_Cast].SetLoopFlag(false);
 	m_animationClipArray[enAnimClip_ReadyCast].Load("Assets/animData/player/readycast.tka");
 	m_animationClipArray[enAnimClip_ReadyCast].SetLoopFlag(false);
+	m_animationClipArray[enAnimClip_Fit].Load("Assets/animData/player/fit.tka");
+	m_animationClipArray[enAnimClip_Fit].SetLoopFlag(false);
 
 	//ターゲットモーションのクリップを初期化する
 	//真ん中のターゲットモーション
@@ -110,23 +112,6 @@ void Player::CalcAngle()
 	angleposition.y = g_pad[0]->GetRStickYF();
 	angleposition.x = g_pad[0]->GetRStickXF();
 
-	/*if (angleposition.x >= 0.7)
-	{
-		angleposition.x = 0.7f;
-	}
-	if (angleposition.y >= 0.7)
-	{
-		angleposition.y = 0.7f;
-	}
-	if (angleposition.x <= -0.7)
-	{
-		angleposition.x = -0.7f;
-	}
-	if (angleposition.y <= -0.7)
-	{
-		angleposition.y = -0.7f;
-	}*/
-
 	//X軸のベクトル。
 	Vector2 axisX = { 1.0f,0.0f };
 	//正規化（長さを１に）
@@ -158,8 +143,6 @@ void Player::CalcAngle()
 
 void Player::ChoiceAngleGroup()
 {
-	//後で治すので今は適当に
-
 	//スティックの入力が無かったら
 	if (g_pad[0]->GetRStickXF() == 0 &&
 		g_pad[0]->GetRStickYF() == 0)
@@ -207,13 +190,8 @@ void Player::ChoiceAngleGroup()
 		m_angleGroup = enAngleGroup_7;
 	}
 	
-	//スティックの入力があったら
-	if (g_pad[0]->GetRStickXF() != 0 ||
-		g_pad[0]->GetRStickYF() != 0)
-	{
-		//面積の計算処理
-		CalcArea();
-	}
+	//面積の計算処理
+	CalcArea();
 }
 
 void Player::CalcArea()
@@ -284,7 +262,6 @@ void Player::CalcArea()
 		//選択してないとき
 	case Player::enAngleGroup_No:
 		//何もしない
-		return;
 		break;
 	}
 
@@ -320,43 +297,24 @@ void Player::CalcArea()
 	}
 	area2.y /= 2.0f;
 
-	
-	//const Vector2 goukei = { 0.3535544845f,0.3535544845f};
-	//Vector2 area3;
-	//area3.x = goukei.x - (area1.x + area2.x);
-	//area3.y = goukei.y - (area1.y + area2.y);
-
-	Vector2 diff;
-	diff.x = axis1.x - m_anglePos.x;
-	diff.y = axis1.y - m_anglePos.y;
-
-	Vector2 diff2;
-	diff2.x = axis2.x - m_anglePos.x;
-	diff2.y = axis2.y - m_anglePos.y;
-
-	Vector2 area3;
-	area3.Cross(diff, diff2);
+	//S3の面積
+	Vector2 area3 = { 0.3535544845f, 0.3535544845f };
+	area3.x -= (area1.x + area2.x);
+	area3.y -= (area1.y + area2.y);
 	if (area3.x < 0.0f)
 	{
-		area3.x *= -1;
+		area3.x = 0.0f;
 	}
-	area3.x /= 2;
-
 	if (area3.y < 0.0f)
 	{
-		area3.y *= -1;
+		area3.y = 0.0f;
 	}
-	area3.y /= 2;
 
 	float allarea;
 	allarea = area1.x + area2.x + area3.x;
 	m_area1 = area1.x / allarea;
 	m_area2 = area2.x / allarea;
 	m_area3 = area3.x / allarea;
-
-
-	//ブレイクポイントつける
-    int a = 0;
 
 	//モーションブレンディング
 	CalcSkeleton();
@@ -408,7 +366,6 @@ void Player::CalcSkeleton()
 		calcAnim[2].Play(enTargetClip_Right);
 		break;
 	case Player::enAngleGroup_No:
-		return;
 		break;
 	}
 
@@ -418,9 +375,18 @@ void Player::CalcSkeleton()
 
 	//重さ仮の数値
 	float brendWeight[3];
-	brendWeight[0] = m_area3;
-	brendWeight[1] = m_area2;
-	brendWeight[2] = m_area1;
+	if (m_angleGroup != enAngleGroup_No)
+	{
+		brendWeight[0] = m_area3;
+		brendWeight[1] = m_area2;
+		brendWeight[2] = m_area1;
+	}
+	else
+	{
+		brendWeight[0] = 1.0f;
+		brendWeight[1] = 0.0f;
+		brendWeight[2] = 0.0f;
+	}
 
 	//最終ボーン計算
 	std::unique_ptr<Matrix[]> boneMatrices;
@@ -521,27 +487,19 @@ void Player::CalcSkeleton()
 		boneMat.m[3][2] += boneMat1.m[3][2] + boneMat2.m[3][2];
 		boneMat.m[3][3] += boneMat1.m[3][3] + boneMat2.m[3][3];
 
-		//boneMat = calcSkeleton[0].GetBoneMatricesTopAddress()[boneNo] * brendWeight[0];
-		//boneMat += calcSkeleton[1].GetBoneMatricesTopAddress()[boneNo] * brendWeight[1];
-		//boneMat += calcSkeleton[2].GetBoneMatricesTopAddress()[boneNo] * brendWeight[2];
-
 		skeleton.SetBoneLocalMatrix(boneNo, boneMat);
 	}
 }
 
 void Player::Update()
 {
-	CalcAngle();
-	
-	
-	//本物
-	Vector3 pos = m_position;
-	pos.z += 50.0f;
+	if (m_playerState == enPlayerState_Fishing)
+	{
+		CalcAngle();
 
-	skeleton.SetMarkPlayAnimation();
-	skeleton.Update(m_modelRender.GetWorldMatrix());
-	//anim.Progress(g_gameTime->GetFrameDeltaTime() * 1.0f);
-
+		skeleton.SetMarkPlayAnimation();
+		skeleton.Update(m_modelRender.GetWorldMatrix());
+	}
 	//移動処理
 	Move();
 	//回転処理
@@ -553,7 +511,11 @@ void Player::Update()
 
 	//モデルの更新
 	m_modelRender.Update();
-	m_modelRender.CopySkeleton(skeleton);
+
+	if (m_playerState == enPlayerState_Fishing)
+	{
+		m_modelRender.CopySkeleton(skeleton);
+	}
 }
 
 void Player::Move()
@@ -579,13 +541,19 @@ void Player::Move()
 	//キャラコンを使用して座標を動かす
 	m_position = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 
-	//揺れるので
-	//モデルの座標にはカメラの座標を入れる
-	Vector3 newposition = m_camera->GetPosition();
-	newposition.y = 0.0f;
-
-	//座標を設定する
-	m_modelRender.SetPosition(newposition);
+	//カメラ固定中ではなかったら
+	if (m_playerState == enPlayerState_Fishing)
+	{
+		//モデルの座標にキャラコンの座標を入れる
+		m_modelRender.SetPosition(m_position);
+	}
+	else
+	{
+		//モデルの座標にはカメラの座標を入れる
+		Vector3 newposition = m_camera->GetPosition();
+		newposition.y = 0.0f;
+		m_modelRender.SetPosition(newposition);
+	}
 }
 
 void Player::Rotation()
@@ -620,6 +588,10 @@ void Player::PlayAnimation()
 		m_modelRender.SetAnimationSpeed(1.0f);
 		m_modelRender.PlayAnimation(enAnimClip_ReadyCast, 0.3f);
 		break;
+	case enPlayerState_Fit:
+		m_modelRender.SetAnimationSpeed(1.0f);
+		m_modelRender.PlayAnimation(enAnimClip_Fit, 0.3f);
+		break;
 	}
 }
 
@@ -639,18 +611,25 @@ void Player::ManageState()
 	case enPlayerState_ReadyCast:
 		ProcessReadyCastStateTransition();
 		break;
+	case enPlayerState_Fit:
+		ProcessFitStateTransition();
+		break;
+	case enPlayerState_Fishing:
+		ProcessFishingStateTransition();
+		break;
 	}
 }
 
 void Player::ProcessCommonStateTransition()
 {
 	//Aボタンが押されたら
-	if (g_pad[0]->IsTrigger(enButtonA))
+	if (g_pad[0]->IsTrigger(enButtonRB2))
 	{
 		//キャスト準備ステートへ
 		m_playerState = enPlayerState_ReadyCast;
 		return;
 	}
+	
 	//移動速度があったら
 	if (fabsf(m_moveSpeed.x) >= 0.001f ||
 		fabsf(m_moveSpeed.z) >= 0.001f)
@@ -685,18 +664,23 @@ void Player::ProcessCastStateTransition()
 	//アニメーションが再生中ではなかったら
 	if (m_modelRender.IsPlayingAnimation() == false)
 	{
-		//ProcessCommonStateTransition();
+		if (g_pad[0]->IsTrigger(enButtonB))
+		{
+			//キャスト準備ステートへ
+			m_playerState = enPlayerState_Fit;
+			return;
+		}
 		return;
 	}
 }
 
 void Player::ProcessReadyCastStateTransition()
 {
-	//アニメーションが再生中ではなかったら
+	////アニメーションが再生中ではなかったら
 	if (m_modelRender.IsPlayingAnimation() == false)
 	{
 		//Aボタンが押されていなかったら
-		if (g_pad[0]->IsPress(enButtonA) == false)
+		if (g_pad[0]->IsPress(enButtonRB2) == false)
 		{
 			//キャストステートへ
 			m_playerState = enPlayerState_Cast;
@@ -705,10 +689,27 @@ void Player::ProcessReadyCastStateTransition()
 	}
 }
 
+void Player::ProcessFitStateTransition()
+{
+	//アニメーションが再生中ではなかったら
+	if (m_modelRender.IsPlayingAnimation() == false)
+	{
+		//キャストステートへ
+		m_playerState = enPlayerState_Fishing;
+		return;
+	}
+}
+
+void Player::ProcessFishingStateTransition()
+{
+	//アニメーションが再生中ではなかったら
+	if (m_modelRender.IsPlayingAnimation() == false)
+	{
+		return;
+	}
+}
 void Player::Render(RenderContext& rc)
 {
-	//本物の描画
-	// model.Draw(rc);
 	//モデルの描画
 	m_modelRender.Draw(rc);
 	m_fontRender.Draw(rc);

@@ -5,6 +5,15 @@ class GameCamera;
 class Player:public IGameObject
 {
 public:
+	enum EnPlayerState
+	{
+		enPlayerState_Idle,
+		enPlayerState_Walk,
+		enPlayerState_Cast,
+		enPlayerState_Fit,
+		enPlayerState_Fishing,
+		enPlayerState_ReadyCast,
+	};
 	Player();
 	~Player();
 	bool Start();
@@ -20,14 +29,12 @@ public:
 	{
 		return m_forward;
 	}
-private:
-	enum EnPlayerState
+
+	const int& GetState() const
 	{
-		enPlayerState_Idle,
-		enPlayerState_Walk,
-		enPlayerState_Cast,
-		enPlayerState_ReadyCast,
-	};
+		return m_playerState;
+	}
+private:
 
 	void LoadAnimationClip();
 	void Move();
@@ -39,6 +46,8 @@ private:
 	void ProcessWalkStateTransition();
 	void ProcessCastStateTransition();
 	void ProcessReadyCastStateTransition();
+	void ProcessFitStateTransition();
+	void ProcessFishingStateTransition();
 
 	void CalcSkeleton();
 	void CalcAngle();
@@ -66,6 +75,7 @@ private:
 		enAnimClip_Walk,
 		enAnimClip_Cast,
 		enAnimClip_ReadyCast,
+		enAnimClip_Fit,
 		enAnimClip_Num
 	};
 
