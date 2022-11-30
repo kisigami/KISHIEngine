@@ -37,6 +37,11 @@ namespace nsK2EngineLow {
 		{
 
 		}
+
+		virtual void OnRender2D(RenderContext& rc)
+		{
+
+		}
 		/// <summary>
 		/// シャドウキャスター？
 		/// </summary>

@@ -109,11 +109,11 @@ namespace nsK2EngineLow
 	void Bloom::Render(RenderContext& rc, RenderTarget& mainRenderTarget)
 	{
 		//輝度抽出
-		TakeLuminanceSprite(rc);
+		//TakeLuminanceSprite(rc);
 		//ガウシアンブラー実行
-		ExcuteGaussianBlur(rc);
+		//ExcuteGaussianBlur(rc);
 		//ボケ画像をメインレンダリングターゲットに加算
-		PulsBokeSprite(rc, mainRenderTarget);
+		//PulsBokeSprite(rc, mainRenderTarget);
 		//メインレンダリングターゲットの絵をフレームバッファにコピー
 		CopyToFrameBufferSprite(rc);
 	}

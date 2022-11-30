@@ -9,9 +9,11 @@ namespace nsK2EngineLow
 	{
 		m_deferredLightingCB.m_light = g_sceneLight.GetSceneLight();
 		//メインレンダリングターゲットの初期化
-		//InitMainRenderTarget();
+		InitMainRenderTarget();
+		Init2DRenderTarget();
 		//ポストエフェクトの初期化
-		//m_postEffect.Init(m_mainRenderTarget);
+	    m_postEffect.Init(m_mainRenderTarget);
+	    
 	}
 
 	void RenderingEngine::Excute(RenderContext& rc)
@@ -22,42 +24,19 @@ namespace nsK2EngineLow
 		//ポストエフェクトの描画
 		m_postEffect.Render(rc,m_mainRenderTarget);
 
+		//2Dの描画
+		Render2D(rc);
+
+		m_renderObjects.clear();
 	}
 
 	void RenderingEngine::Render2D(RenderContext& rc)
 	{
-		BeginGPUEvent("Render2D");
-		// レンダリングターゲットとして利用できるまで待つ。
-		//PRESENTからRENDERTARGETへ。
-		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
-
-		// レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_2DRenderTarget);
-
-		// レンダリングターゲットをクリア
-		rc.ClearRenderTargetView(m_2DRenderTarget);
-
-		m_mainSprite.Draw(rc);
-
+		//2D描画オブジェクト描画する
 		for (auto& renderObj : m_renderObjects)
 		{
-			//renderObj->OnRender2D(rc);
+			renderObj->OnRender2D(rc);
 		}
-
-		//RENDERTARGETからPRESENTへ。
-		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
-		//PRESENTからRENDERTARGETへ。
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-
-		// レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-
-		m_2DSprite.Draw(rc);
-
-		//RENDERTARGETからPRESENTへ。
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
-
-		EndGPUEvent();
 	}
 
 	void RenderingEngine::InitMainRenderTarget()
@@ -73,63 +52,69 @@ namespace nsK2EngineLow
 		);
 	}
 
-	void RenderingEngine::InitDeferrdLighting()
+	void RenderingEngine::Init2DRenderTarget()
 	{
-		//スプライトの初期化データを作成
+		float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
+
+		m_2DRenderTarget.Create(
+			UI_SPACE_WIDTH,
+			UI_SPACE_HEIGHT,
+			1,
+			1,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_FORMAT_UNKNOWN,
+			clearColor
+		);
+
+		// 最終合成用のスプライトを初期化する
 		SpriteInitData spriteInitData;
-		spriteInitData.m_textures[0] = &m_albedRenderTarget.GetRenderTargetTexture();
-		spriteInitData.m_textures[1] = &m_normalRenderTarget.GetRenderTargetTexture();
-		//シェーダーを指定
-		spriteInitData.m_fxFilePath = "Assets/shader/sample2D.fx";
-		//スプライトの幅を設定
+		//テクスチャは2Dレンダ―ターゲット。
+		spriteInitData.m_textures[0] = &m_2DRenderTarget.GetRenderTargetTexture();
+		// 解像度はmainRenderTargetの幅と高さ
+		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
+		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
+		// 2D用のシェーダーを使用する
+		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
+		spriteInitData.m_vsEntryPointFunc = "VSMain";
+		spriteInitData.m_psEntryPoinFunc = "PSMain";
+		//上書き。
+		spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
+		//レンダリングターゲットのフォーマット。
+		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
+
+		m_2DSprite.Init(spriteInitData);
+
+		//テクスチャはメインレンダ―ターゲット。
+		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
+
+		//解像度は2Dレンダ―ターゲットの幅と高さ
+		spriteInitData.m_width = m_2DRenderTarget.GetWidth();
+		spriteInitData.m_height = m_2DRenderTarget.GetHeight();
+		//レンダリングターゲットのフォーマット。
+		spriteInitData.m_colorBufferFormat[0] = m_2DRenderTarget.GetColorBufferFormat();
+
+		m_mainSprite.Init(spriteInitData);
+	}
+
+	void RenderingEngine::InitCopyMainRenderTargetToFrameBufferSprite()
+	{
+		SpriteInitData spriteInitData;
+
+		// テクスチャはyBlurRenderTargetのカラーバッファー
+		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
+
+		// レンダリング先がフレームバッファーなので、解像度はフレームバッファーと同じ
 		spriteInitData.m_width = g_graphicsEngine->GetFrameBufferWidth();
-		//スプライトの高さを設定
 		spriteInitData.m_height = g_graphicsEngine->GetFrameBufferHeight();
-		spriteInitData.m_expandConstantBuffer = &m_deferredLightingCB;
-		spriteInitData.m_expandConstantBufferSize = sizeof(m_deferredLightingCB);
-		//初期化データでスプライトを初期化
-		m_diferredLightingSprite.Init(spriteInitData);
-	}
 
-	void RenderingEngine::DeferredLighting(RenderContext& rc)
-	{
-		m_deferredLightingCB.m_light.eyePos = g_camera3D->GetPosition();
-		//m_deferredLightingCB.m_light.mViewProjInv.Inverse(g_camera3D->GetViewProjectionMatrix());
+		// ガンマ補正ありの2D描画のシェーダーを指定する
+		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
+		spriteInitData.m_psEntryPoinFunc = "PSMain";
+		spriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		RenderTarget* rts[] = {
-			&m_albedRenderTarget,
-			&m_normalRenderTarget
-		};
-		rc.WaitUntilFinishDrawingToRenderTargets(2, rts);
-		rc.SetRenderTargets(2, rts);
-		rc.ClearRenderTargetViews(2, rts);
-		rc.WaitUntilFinishDrawingToRenderTargets(2, rts);
+		// 初期化オブジェクトを使って、スプライトを初期化する
+		m_copyMainRtToFrameBufferSprite.Init(spriteInitData);
 
-
-
-		g_graphicsEngine->ChangeRenderTargetToFrameBuffer(rc);
-		m_diferredLightingSprite.Draw(rc);
-	}
-
-	void RenderingEngine::InitGBuffer()
-	{
-		m_albedRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),  //フレームバッファの幅
-			g_graphicsEngine->GetFrameBufferHeight(), //フレームバッファの高さ
-			1,                                        //ミップマップレベル
-			1,                                        //テクスチャ配列のサイズ
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			DXGI_FORMAT_D32_FLOAT
-		);
-
-		m_normalRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),  //フレームバッファの幅
-			g_graphicsEngine->GetFrameBufferHeight(), //フレームバッファの高さ
-			1,                                        //ミップマップレベル
-			1,                                        //テクスチャ配列のサイズ
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			DXGI_FORMAT_UNKNOWN
-		);
 	}
 
 	void RenderingEngine::SetMainRenderTarget(RenderContext& rc)

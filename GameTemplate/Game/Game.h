@@ -15,6 +15,7 @@ public:
 
 private:
 	ModelRender m_modelRender;
+	SpriteRender m_spriteRender;
 
 	Player* m_player = nullptr;
 	BackGround* m_backGround = nullptr;

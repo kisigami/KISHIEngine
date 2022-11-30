@@ -24,16 +24,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//ゲーム作成
 	auto game = NewGO<Game>(0, "game");
 
-	auto& renderContext = g_graphicsEngine->GetRenderContext();
-
 	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
+		auto& renderContext = g_graphicsEngine->GetRenderContext();
 		// フレームの開始時に呼び出す必要がある処理を実行
 		g_k2EngineLow->BeginFrame();
 	
 		//レンダリングターゲットの設定
-		//g_renderingEngine.SetMainRenderTarget(renderContext);
+		g_renderingEngine.SetMainRenderTarget(renderContext);
 
 		//更新処理
 		g_k2EngineLow->ExecuteUpdate();
@@ -41,7 +40,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		g_k2EngineLow->ExecuteRender();
 
 		//ポストエフェクト実行
-		//g_renderingEngine.Excute(renderContext);
+		g_renderingEngine.Excute(renderContext);
 
 		// フレームの終了時に呼び出す必要がある処理を実行。
 		g_k2EngineLow->EndFrame();

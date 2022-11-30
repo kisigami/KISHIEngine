@@ -1,9 +1,10 @@
+
+
 cbuffer cb : register(b0)
 {
-    float4x4 mvp; // MVP行列
-    float4 mulColor; // 乗算カラー
+    float4x4 mvp; 
+    float4 mulColor; 
 };
-
 struct VSInput
 {
     float4 pos : POSITION;
@@ -16,7 +17,7 @@ struct PSInput
     float2 uv : TEXCOORD0;
 };
 
-Texture2D<float4> colorTexture : register(t0); // カラーテクスチャ
+Texture2D<float4> colorTexture : register(t0);
 sampler Sampler : register(s0);
 
 PSInput VSMain(VSInput In)
@@ -29,9 +30,12 @@ PSInput VSMain(VSInput In)
 
 float4 PSMain(PSInput In) : SV_Target0
 {
-    float4 color = colorTexture.Sample(Sampler, In.uv);
+    return colorTexture.Sample(Sampler, In.uv) * mulColor;
+}
 
-    // step-3 ピクセルシェーダーから出力するαを変更する
-
+float4 PSMainGamma(PSInput In) : SV_Target0
+{
+    float4 color = colorTexture.Sample(Sampler, In.uv) * mulColor;
+    color.xyz = pow(max(color.xyz, 0.0001f), 1.0f / 2.2f);
     return color;
 }

@@ -15,6 +15,7 @@ namespace nsK2EngineLow
 		{
 			m_renderObjects.push_back(renderObject);
 		}
+
 		struct SDeferredLightingCB
 		{
 			Light m_light;              // ライト
@@ -46,9 +47,12 @@ namespace nsK2EngineLow
 		/// </summary>
 		/// <param name="rc">レンダリングコンテキスト</param>
 		void SetMainRenderTarget(RenderContext& rc);
-	
+		void Init2DRenderTarget();
 
+		void InitCopyMainRenderTargetToFrameBufferSprite();
+	
 	private:
+		Sprite m_copyMainRtToFrameBufferSprite;
 		Sprite m_mainSprite;
 		Sprite m_2DSprite;
 		SDeferredLightingCB m_deferredLightingCB;

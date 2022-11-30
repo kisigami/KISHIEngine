@@ -21,15 +21,17 @@ bool Game::Start()
 	m_backGround = NewGO<BackGround>(0, "background");
 	m_player = NewGO<Player>(0, "player");
 
+	
+
 	return true;
 }
 
 void Game::Update()
 {
-	
+
 }
 
 void Game::Render(RenderContext& rc)
 {
-
+	
 }

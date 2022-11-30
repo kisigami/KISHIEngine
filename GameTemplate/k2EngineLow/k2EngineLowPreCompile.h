@@ -83,6 +83,7 @@ using namespace Microsoft::WRL;
 #include "Bloom.h"
 #include "Monochrome.h"
 #include "FontRender.h"
+#include "SpriteRender.h"
 
 const UINT FRAME_BUFFER_W = 1600;	// フレームバッファの幅。
 const UINT FRAME_BUFFER_H = 900;	// フレームバッファの高さ。
