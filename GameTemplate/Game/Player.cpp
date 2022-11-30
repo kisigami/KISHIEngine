@@ -496,7 +496,6 @@ void Player::Update()
 	if (m_playerState == enPlayerState_Fishing)
 	{
 		CalcAngle();
-
 		skeleton.SetMarkPlayAnimation();
 		skeleton.Update(m_modelRender.GetWorldMatrix());
 	}
@@ -508,7 +507,7 @@ void Player::Update()
 	PlayAnimation();
 	//各ステートの遷移処理
 	ManageState();
-
+	CalcCastPower();
 	//モデルの更新
 	m_modelRender.Update();
 
@@ -566,6 +565,35 @@ void Player::Rotation()
 	m_rotation.SetRotationYFromDirectionXZ(vector);
 	//回転を設定する
 	m_modelRender.SetRotation(m_rotation);
+}
+
+void Player::CalcCastPower()
+{
+	if (m_playerState != enPlayerState_ReadyCast)
+	{
+		return;
+	}
+
+	if (m_castPower > 1.0f)
+	{
+		m_castPower = 1.0f;
+		flag = true;
+	}
+	if (m_castPower < 0.0f)
+	{
+		m_castPower = 0.0f;
+		flag = false;
+	}
+
+	switch (flag)
+	{
+	case true:
+		m_castPower -= g_gameTime->GetFrameDeltaTime() * 0.5f;
+		break;
+	case false:
+		m_castPower += g_gameTime->GetFrameDeltaTime() * 0.5f;
+		break;
+	}
 }
 
 void Player::PlayAnimation()

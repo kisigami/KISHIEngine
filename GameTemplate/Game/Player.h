@@ -34,6 +34,10 @@ public:
 	{
 		return m_playerState;
 	}
+	const float& GetCastPower() const
+	{
+		return m_castPower;
+	}
 private:
 
 	void LoadAnimationClip();
@@ -54,6 +58,7 @@ private:
 	void ChoiceAngleGroup();
 	void CalcArea();
 
+	void CalcCastPower();
 	//角度をグループ分けしたい
 	enum EnAngleGroup
 	{
@@ -127,5 +132,7 @@ private:
 	float m_area2;
 	float m_area3;
 	Vector2 m_allArea;
+	float m_castPower = 0.0f;
+	bool flag = false;
 };
 
