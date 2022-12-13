@@ -41,7 +41,8 @@ void GameCamera::Update()
 	float y = g_pad[0]->GetRStickYF();
 
 	//’Þ‚ê‚½‚çƒJƒƒ‰ŒÅ’è
-	if (m_player->GetState() != m_player->enPlayerState_Fishing)
+	if (m_player->GetState() != m_player->enPlayerState_Fishing &&
+		m_player->GetState() != m_player->enPlayerState_Fishing_Idle)
 	{
 		//YŽ²Žü‚è‚Ì‰ñ“]
 		Quaternion qRot;

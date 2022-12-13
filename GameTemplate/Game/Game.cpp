@@ -5,6 +5,7 @@
 #include "BackGround.h"
 #include "GameCamera.h"
 #include "UserInterface.h"
+#include "Fish.h"
 
 Game::Game()
 {
@@ -22,6 +23,7 @@ bool Game::Start()
 	m_backGround = NewGO<BackGround>(0, "background");
 	m_player = NewGO<Player>(0, "player");
 	m_ui = NewGO<UserInterface>(0,"userinterface");
+	m_fish = NewGO<Fish>(0, "fish");
 
 	return true;
 }

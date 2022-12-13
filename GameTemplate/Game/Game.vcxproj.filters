@@ -16,6 +16,8 @@
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="UserInterface.cpp" />
+    <ClCompile Include="FishingFloat.cpp" />
+    <ClCompile Include="Fish.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -27,5 +29,7 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="UserInterface.h" />
+    <ClInclude Include="FishingFloat.h" />
+    <ClInclude Include="Fish.h" />
   </ItemGroup>
 </Project>

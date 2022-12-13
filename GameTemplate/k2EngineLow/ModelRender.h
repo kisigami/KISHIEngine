@@ -22,7 +22,7 @@ namespace  nsK2EngineLow {
 			m_position = position;
 		}
 
-		void SetScale(Vector3& scale)
+		void SetScale(const Vector3& scale)
 		{
 			m_scale = scale;
 		}
@@ -30,6 +30,13 @@ namespace  nsK2EngineLow {
 		void SetRotation(const Quaternion& rotation)
 		{
 			m_rotation = rotation;
+		}
+
+		void SetTRS(const Vector3& pos, const Quaternion& rotation, const Vector3& scale)
+		{
+			SetPosition(pos);
+			SetRotation(rotation);
+			SetScale(scale);
 		}
 
 		void PlayAnimation(int animNo, float interpolateTime = 0.0f)
@@ -58,6 +65,16 @@ namespace  nsK2EngineLow {
 			{
 				m_skeleton.SetBoneMatrix(boneNo, skeleton.GetBoneMatrix(boneNo));
 			}
+		}
+
+		int FindBoneID(const wchar_t* boneName) const
+		{
+			return m_skeleton.FindBoneID(boneName);
+		}
+
+		Bone* GetBone(int boneNo) const
+		{
+			return m_skeleton.GetBone(boneNo);
 		}
 
 	private:

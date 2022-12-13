@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "GameCamera.h"
+#include "FishingFloat.h"
 
 namespace
 {
@@ -33,32 +34,32 @@ void Player::LoadAnimationClip()
 
 	//ターゲットモーションのクリップを初期化する
 	//真ん中のターゲットモーション
-	targetClipArray[enTargetClip_Normal].Load("Assets/animData/player/rodnormal.tka");
-	targetClipArray[enTargetClip_Normal].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_Normal].Load("Assets/animData/player/rodnormal.tka");
+	m_animationClipArray[enTargetClip_Normal].SetLoopFlag(false);
 	//上のターゲットモーション
-	targetClipArray[enTargetClip_Up].Load("Assets/animData/player/rodup.tka");
-	targetClipArray[enTargetClip_Up].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_Up].Load("Assets/animData/player/rodup.tka");
+	m_animationClipArray[enTargetClip_Up].SetLoopFlag(false);
 	//右上のターゲットモーション
-	targetClipArray[enTargetClip_UpRight].Load("Assets/animData/player/rodupright.tka");
-	targetClipArray[enTargetClip_UpRight].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_UpRight].Load("Assets/animData/player/rodupright.tka");
+	m_animationClipArray[enTargetClip_UpRight].SetLoopFlag(false);
 	//右のターゲットモーション
-	targetClipArray[enTargetClip_Right].Load("Assets/animData/player/rodright.tka");
-	targetClipArray[enTargetClip_Right].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_Right].Load("Assets/animData/player/rodright.tka");
+	m_animationClipArray[enTargetClip_Right].SetLoopFlag(false);
 	//右下のターゲットモーション
-	targetClipArray[enTargetClip_DownRight].Load("Assets/animData/player/roddownright.tka");
-	targetClipArray[enTargetClip_DownRight].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_DownRight].Load("Assets/animData/player/roddownright.tka");
+	m_animationClipArray[enTargetClip_DownRight].SetLoopFlag(false);
 	//下のターゲットモーション
-	targetClipArray[enTargetClip_Down].Load("Assets/animData/player/roddown.tka");
-	targetClipArray[enTargetClip_Down].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_Down].Load("Assets/animData/player/roddown.tka");
+	m_animationClipArray[enTargetClip_Down].SetLoopFlag(false);
 	//左下のターゲットモーション
-	targetClipArray[enTargetClip_DownLeft].Load("Assets/animData/player/roddownleft.tka");
-	targetClipArray[enTargetClip_DownLeft].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_DownLeft].Load("Assets/animData/player/roddownleft.tka");
+	m_animationClipArray[enTargetClip_DownLeft].SetLoopFlag(false);
 	//左のターゲットモーション
-	targetClipArray[enTargetClip_Left].Load("Assets/animData/player/rodleft.tka");
-	targetClipArray[enTargetClip_Left].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_Left].Load("Assets/animData/player/rodleft.tka");
+	m_animationClipArray[enTargetClip_Left].SetLoopFlag(false);
 	//左上のターゲットモーション
-	targetClipArray[enTargetClip_UpLeft].Load("Assets/animData/player/rodupleft.tka");
-	targetClipArray[enTargetClip_UpLeft].SetLoopFlag(false);
+	m_animationClipArray[enTargetClip_UpLeft].Load("Assets/animData/player/rodupleft.tka");
+	m_animationClipArray[enTargetClip_UpLeft].SetLoopFlag(false);
 
 	//計算用のアニメーションを初期化する
 	for (int i = 0; i < 3; i++)
@@ -66,27 +67,17 @@ void Player::LoadAnimationClip()
 		//スケルトンをロードする
 		calcSkeleton[i].Init("Assets/modelData/player/player.tks");
 		//アニメーションにスケルトンとターゲットモーションを渡す
-		calcAnim[i].Init(calcSkeleton[i], targetClipArray,enTargetClip_Num);
+		calcAnim[i].Init(calcSkeleton[i], m_animationClipArray, enAnimClip_Num);
 	}
 
-	//本物のモデル
-	ModelInitData initData;
-	initData.m_tkmFilePath = "Assets/modelData/player/player.tkm";
-	initData.m_fxFilePath = "Assets/shader/model.fx";
 	skeleton.Init("Assets/modelData/player/player.tks");
-	initData.m_expandConstantBuffer = &g_renderingEngine.GetDeferredLightingCB();
-	initData.m_expandConstantBufferSize = sizeof(g_renderingEngine.GetDeferredLightingCB());
-	initData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	initData.m_vsEntryPointFunc = "VSMain";
-	initData.m_skeleton = &skeleton;
-	initData.m_vsSkinEntryPointFunc = "VSSkinMain";
-	model.Init(initData);
 }
 
 bool Player::Start()
 {
 	//カメラのインスタンスを探す
 	m_camera = FindGO<GameCamera>("gamecamera");
+	m_fishingFloat = FindGO<FishingFloat>("fish");
 	//アニメーションのロード
 	LoadAnimationClip();
 	//モデルの読み込み
@@ -97,6 +88,8 @@ bool Player::Start()
 	m_position = Vector3::Zero;
 	m_modelRender.SetPosition(m_position);
 	m_modelRender.SetScale(scale);
+
+	m_rodBoneID = m_modelRender.FindBoneID(L"RodBone004");
 	//キャラコンを読み込み
 	m_charaCon.Init(25.0f, 70.0f, m_position);
 	//モデルの更新
@@ -104,8 +97,214 @@ bool Player::Start()
 	return true;
 }
 
+void Player::Update()
+{
+	//移動処理
+	Move();
+	//回転処理
+	Rotation();
+	//各ステートの遷移処理
+	ManageState();
+	//投げる力の計算
+	CalcCastPower();
+	//釣り処理
+	Fishing();
+	//角度の計算
+	CalcAngle();
+	//マークを付ける
+	skeleton.SetMarkPlayAnimation();
+	//スケルトン更新
+	skeleton.Update(m_modelRender.GetWorldMatrix());
+	//モデルの更新
+	m_modelRender.Update();
+	//スケルトンのコピー
+	m_modelRender.CopySkeleton(skeleton);
+
+	//竿先のボーン行列を取得
+	Matrix matrix = skeleton.GetBone(m_rodBoneID)->GetWorldMatrix();
+	//座標を設定
+	m_rodTopPos.x = matrix.m[3][0];
+	m_rodTopPos.y = matrix.m[3][1];
+	m_rodTopPos.z = matrix.m[3][2];
+
+	wchar_t wcsbuf[256];
+	swprintf_s(wcsbuf, 256, L"タイマー%f", float(m_fleeTimer));
+
+	//表示するテキストを設定。
+	m_fontRender.SetText(wcsbuf);
+	m_fontRender.SetPosition(-500.0f, 200.0f, 1.0f);
+	m_fontRender.SetScale(2.3f);
+	m_fontRender.SetColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+
+	wchar_t wcsbuf2[256];
+	swprintf_s(wcsbuf2, 256, L"広内%f", float(m_fishFatigueValue));
+
+	//表示するテキストを設定。
+	m_fontRender2.SetText(wcsbuf2);
+	m_fontRender2.SetPosition(-500.0f, 100.0f, 1.0f);
+	m_fontRender2.SetScale(2.3f);
+	m_fontRender2.SetColor(Vector4(1.0f, 1.0f, 0.0f, 1.0f));
+
+}
+
+void Player::Move()
+{
+	//移動速度
+	m_moveSpeed.x = 0.0f;
+	m_moveSpeed.z = 0.0f;
+	//ステックの入力量を取得
+	float lStick_x = g_pad[0]->GetLStickXF();
+	float lStick_y = g_pad[0]->GetLStickYF();
+	//cameraの前方向と右方向を取得
+	Vector3 cameraForward = g_camera3D->GetForward();
+	Vector3 cameraRight = g_camera3D->GetRight();
+	//XZ平面での前方方向、右方向に変換する
+	cameraForward.y = 0.0f;
+	cameraForward.Normalize();
+	cameraRight.y = 0.0f;
+	cameraRight.Normalize();
+	//スティックの入力量×速度	
+	m_moveSpeed += cameraForward * lStick_y * 1000.0f;
+	m_moveSpeed += cameraRight * lStick_x * 1000.0f;
+	m_moveSpeed.y = 0.0f;
+	//キャラコンを使用して座標を動かす
+	m_position = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
+
+	m_modelRender.SetPosition(m_position);
+}
+
+void Player::Rotation()
+{
+	//注視点へのベクトルを計算する
+	Vector3 vector = m_camera->GetTarget() - m_camera->GetPosition();
+	//正規化する
+	vector.Normalize();
+	//注視点を向く回転を作成
+	m_rotation.SetRotationYFromDirectionXZ(vector);
+	//回転を設定する
+	m_modelRender.SetRotation(m_rotation);
+
+	m_forward = Vector3::AxisZ;
+	m_rotation.Apply(m_forward);
+}
+
+void Player::CalcCastPower()
+{
+	if (m_playerState != enPlayerState_ReadyCast)
+	{
+		return;
+	}
+
+	if (m_castPower > 1.0f)
+	{
+		m_castPower = 1.0f;
+		flag = true;
+	}
+	if (m_castPower < 0.0f)
+	{
+		m_castPower = 0.0f;
+		flag = false;
+	}
+
+	switch (flag)
+	{
+	case true:
+		m_castPower -= g_gameTime->GetFrameDeltaTime() * 0.5f;
+		break;
+	case false:
+		m_castPower += g_gameTime->GetFrameDeltaTime() * 0.5f;
+		break;
+	}
+}
+
+void Player::Fishing()
+{
+	//フィッシング待機ステート以外なら
+	if (m_playerState != enPlayerState_Fishing_Idle)
+	{
+		//何もしない
+		return;
+	}
+
+	//LB2ボタンが押されているか?
+	if (g_pad[0]->IsPress(enButtonLB2))
+	{
+		//リールが巻かれている
+		coilingFlag = true;
+	}
+	else
+	{
+		//リールが巻かれていない
+		coilingFlag = false;
+	}
+
+	//糸の張りが最大値を超えていたら
+	if (m_fishiPower >= 1.0f)
+	{
+		//タイマーを加算する
+		m_fleeTimer += g_gameTime->GetFrameDeltaTime();
+	}
+	else
+	{
+		//タイマーをリセットする
+		m_fleeTimer = 0.0f;
+	}
+
+	if (m_fleeTimer >= 1.0f)
+	{
+		//待機ステートに
+		m_playerState = enPlayerState_Idle;
+		DeleteGO(m_fishingFloat);
+		a = false;
+	}
+
+	////リールを巻いてないとき
+	//if (coilingFlag == false)
+	//{
+	//	m_fishiPower -= g_gameTime->GetFrameDeltaTime() * 0.7f;
+	//	if (m_fishiPower < 0.0f)
+	//	{
+	//		m_fishiPower = 0.0f;
+	//	}
+	//	m_fishFatigueValue -= g_gameTime->GetFrameDeltaTime() * 0.5f;
+	//}
+	////巻いてるとき
+	//else
+	//{
+	//	m_fishiPower += g_gameTime->GetFrameDeltaTime() * 2.0f;
+	//	if (m_fishiPower > 1.0f)
+	//	{
+	//		m_fishiPower = 1.0f;
+	//	}
+	//	m_fishFatigueValue += g_gameTime->GetFrameDeltaTime() * 3.0f;
+	//}
+
+	//ある程度近かったら終わり
+	Vector3 diff = m_fishingFloat->GetPosition() - m_rodTopPos;
+	if (diff.Length() < 140.0f)
+	{
+		m_playerState = enPlayerState_Idle;
+		DeleteGO(m_fishingFloat);
+		a = false;
+	}
+	////ある程度遠かったら終わり
+	//if (diff.Length() > 2500.0f)
+	//{
+	//	m_playerState = enPlayerState_Idle;
+	//	DeleteGO(m_fishingFloat);
+	//	a = false;
+	//}
+}
+
 void Player::CalcAngle()
 {
+	if (m_playerState != enPlayerState_Fishing &&
+		m_playerState != enPlayerState_Fishing_Idle)
+	{
+		CalcArea();
+		return;
+	}
+
 	Vector2 originPosition = Vector2::Zero;
 	Vector2 angleposition = Vector2::Zero;
 
@@ -124,19 +323,19 @@ void Player::CalcAngle()
 
 	//cos値を求める。
 	float angleCos = dot / angleposition.Length();
-	
+
 	//入力角度を求める。
 	float angle = acos(angleCos);
 	angle = Math::RadToDeg(angle);
-	
+
 	//入力方向がしためだったら判定角度を反転。
-	if (angleposition.y < 0) 
+	if (angleposition.y < 0)
 	{
 		angle = 360.0f - angle;
 	}
 
 	m_angle = angle;
-	
+
 	//角度でグループ分け処理
 	ChoiceAngleGroup();
 }
@@ -189,7 +388,7 @@ void Player::ChoiceAngleGroup()
 	{
 		m_angleGroup = enAngleGroup_7;
 	}
-	
+
 	//面積の計算処理
 	CalcArea();
 }
@@ -199,8 +398,8 @@ void Player::CalcArea()
 	//面積を計算するための軸を定義
 	Vector2 axis1 = { 0.0f,0.0f };
 	Vector2 axis2 = { 0.0f,0.0f };
-
-	//面積を計算するための軸を選択
+	float animSpeed = 60.0f / 1.0f;
+	//面積を計算するための軸とターゲットクリップを選択
 	switch (m_angleGroup)
 	{
 		//0度から45度の時
@@ -209,6 +408,9 @@ void Player::CalcArea()
 		axis1 = { 1.0f,0.0f };
 		//右上の軸
 		axis2 = { 1.0f,1.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Right);
+		calcAnim[2].Play(enTargetClip_UpRight);
 		break;
 		//46度から90度の時
 	case Player::enAngleGroup_1:
@@ -216,6 +418,9 @@ void Player::CalcArea()
 		axis1 = { 1.0f,1.0f };
 		//真上の軸
 		axis2 = { 0.0f,1.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_UpRight);
+		calcAnim[2].Play(enTargetClip_Up);
 		break;
 		//91度から135度の時
 	case Player::enAngleGroup_2:
@@ -223,6 +428,9 @@ void Player::CalcArea()
 		axis1 = { 0.0f,1.0f };
 		//左上の軸
 		axis2 = { -1.0f,1.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Up);
+		calcAnim[2].Play(enTargetClip_UpLeft);
 		break;
 		//135度から180度の時
 	case Player::enAngleGroup_3:
@@ -230,6 +438,9 @@ void Player::CalcArea()
 		axis1 = { -1.0f,1.0f };
 		//真左の軸
 		axis2 = { -1.0f,0.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_UpLeft);
+		calcAnim[2].Play(enTargetClip_Left);
 		break;
 		//181度から225度の時
 	case Player::enAngleGroup_4:
@@ -237,6 +448,9 @@ void Player::CalcArea()
 		axis1 = { -1.0f,0.0f };
 		//左下の軸
 		axis2 = { -1.0f,-1.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Left);
+		calcAnim[2].Play(enTargetClip_DownLeft);
 		break;
 		//226度から270度の時
 	case Player::enAngleGroup_5:
@@ -244,6 +458,9 @@ void Player::CalcArea()
 		axis1 = { -1.0f,-1.0f };
 		//真下の軸
 		axis2 = { 0.0f,-1.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_DownLeft);
+		calcAnim[2].Play(enTargetClip_Down);
 		break;
 		//271度から315度の時
 	case Player::enAngleGroup_6:
@@ -251,6 +468,9 @@ void Player::CalcArea()
 		axis1 = { 0.0f,-1.0f };
 		//右下の軸
 		axis2 = { 1.0f,-1.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_Down);
+		calcAnim[2].Play(enTargetClip_DownRight);
 		break;
 		//316度から360度の時
 	case Player::enAngleGroup_7:
@@ -258,12 +478,44 @@ void Player::CalcArea()
 		axis1 = { 1.0f,-1.0f };
 		//真右の軸
 		axis2 = { 1.0f,0.0f };
+		calcAnim[0].Play(enTargetClip_Normal);
+		calcAnim[1].Play(enTargetClip_DownRight);
+		calcAnim[2].Play(enTargetClip_Right);
 		break;
 		//選択してないとき
 	case Player::enAngleGroup_No:
 		//何もしない
+	default:
+		switch (m_playerState)
+		{
+		case Player::enPlayerState_Idle:
+			calcAnim[0].Play(enAnimClip_Idle, 0.3f);
+			animSpeed = 1.0f;
+			break;
+		case Player::enPlayerState_Walk:
+			calcAnim[0].Play(enAnimClip_Walk, 0.3f);
+			animSpeed = 1.4f;
+			break;
+		case Player::enPlayerState_Cast:
+			calcAnim[0].Play(enAnimClip_Cast, 0.3f);
+			animSpeed = 2.0f;
+			break;
+		case Player::enPlayerState_Fit:
+			calcAnim[0].Play(enAnimClip_Fit, 0.3f);
+			animSpeed = 1.0f;
+			break;
+		case Player::enPlayerState_ReadyCast:
+			calcAnim[0].Play(enAnimClip_ReadyCast, 0.3f);
+			animSpeed = 1.0f;
+			break;
+		}
 		break;
 	}
+
+	//アニメーション再生
+	calcAnim[0].Progress(animSpeed * g_gameTime->GetFrameDeltaTime());
+	calcAnim[1].Progress(1 / 60.0f);
+	calcAnim[2].Progress(1 / 60.0f);
 
 	float angle = m_angle;
 
@@ -316,66 +568,8 @@ void Player::CalcArea()
 	m_area2 = area2.x / allarea;
 	m_area3 = area3.x / allarea;
 
-	//モーションブレンディング
-	CalcSkeleton();
-}
-
-void Player::CalcSkeleton()
-{
-    //グループで再生するアニメーション分ける
-	switch (m_angleGroup)
-	{
-	case Player::enAngleGroup_0:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_Right);
-		calcAnim[2].Play(enTargetClip_UpRight);
-		break;
-	case Player::enAngleGroup_1:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_UpRight);
-		calcAnim[2].Play(enTargetClip_Up);
-		break;
-	case Player::enAngleGroup_2:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_Up);
-		calcAnim[2].Play(enTargetClip_UpLeft);
-		break;
-	case Player::enAngleGroup_3:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_UpLeft);
-		calcAnim[2].Play(enTargetClip_Left);
-		break;
-	case Player::enAngleGroup_4:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_Left);
-		calcAnim[2].Play(enTargetClip_DownLeft);
-		break;
-	case Player::enAngleGroup_5:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_DownLeft);
-		calcAnim[2].Play(enTargetClip_Down);
-		break;
-	case Player::enAngleGroup_6:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_Down);
-		calcAnim[2].Play(enTargetClip_DownRight);
-		break;
-	case Player::enAngleGroup_7:
-		calcAnim[0].Play(enTargetClip_Normal);
-		calcAnim[1].Play(enTargetClip_DownRight);
-		calcAnim[2].Play(enTargetClip_Right);
-		break;
-	case Player::enAngleGroup_No:
-		break;
-	}
-
-	calcAnim[0].Progress(1 / 60.0f);
-	calcAnim[1].Progress(1 / 60.0f);
-	calcAnim[2].Progress(1 / 60.0f);
-
 	//重さ仮の数値
-	float brendWeight[3];
-	if (m_angleGroup != enAngleGroup_No)
+	if (m_angleGroup != enAngleGroup_No && m_playerState == enPlayerState_Fishing || m_playerState == enPlayerState_Fishing_Idle)
 	{
 		brendWeight[0] = m_area3;
 		brendWeight[1] = m_area2;
@@ -388,6 +582,11 @@ void Player::CalcSkeleton()
 		brendWeight[2] = 0.0f;
 	}
 
+	MotionBlending();
+}
+
+void Player::MotionBlending()
+{
 	//最終ボーン計算
 	std::unique_ptr<Matrix[]> boneMatrices;
 	boneMatrices.reset(new Matrix[skeleton.GetNumBones()]);
@@ -407,7 +606,7 @@ void Player::CalcSkeleton()
 		boneMat.m[1][1] *= brendWeight[0];
 		boneMat.m[1][2] *= brendWeight[0];
 		boneMat.m[1][3] *= brendWeight[0];
-		
+
 		boneMat.m[2][0] *= brendWeight[0];
 		boneMat.m[2][1] *= brendWeight[0];
 		boneMat.m[2][2] *= brendWeight[0];
@@ -471,12 +670,12 @@ void Player::CalcSkeleton()
 		boneMat.m[0][1] += boneMat1.m[0][1] + boneMat2.m[0][1];
 		boneMat.m[0][2] += boneMat1.m[0][2] + boneMat2.m[0][2];
 		boneMat.m[0][3] += boneMat1.m[0][3] + boneMat2.m[0][3];
-		
+
 		boneMat.m[1][0] += boneMat1.m[1][0] + boneMat2.m[1][0];
 		boneMat.m[1][1] += boneMat1.m[1][1] + boneMat2.m[1][1];
 		boneMat.m[1][2] += boneMat1.m[1][2] + boneMat2.m[1][2];
 		boneMat.m[1][3] += boneMat1.m[1][3] + boneMat2.m[1][3];
-		
+
 		boneMat.m[2][0] += boneMat1.m[2][0] + boneMat2.m[2][0];
 		boneMat.m[2][1] += boneMat1.m[2][1] + boneMat2.m[2][1];
 		boneMat.m[2][2] += boneMat1.m[2][2] + boneMat2.m[2][2];
@@ -489,137 +688,34 @@ void Player::CalcSkeleton()
 
 		skeleton.SetBoneLocalMatrix(boneNo, boneMat);
 	}
-}
 
-void Player::Update()
-{
-	if (m_playerState == enPlayerState_Fishing)
+	//アニメーション再生中ではない
+	if (calcAnim[0].IsPlaying() == false)
 	{
-		CalcAngle();
-		skeleton.SetMarkPlayAnimation();
-		skeleton.Update(m_modelRender.GetWorldMatrix());
-	}
-	//移動処理
-	Move();
-	//回転処理
-	Rotation();
-	//アニメーション処理
-	PlayAnimation();
-	//各ステートの遷移処理
-	ManageState();
-	CalcCastPower();
-	//モデルの更新
-	m_modelRender.Update();
-
-	if (m_playerState == enPlayerState_Fishing)
-	{
-		m_modelRender.CopySkeleton(skeleton);
-	}
-}
-
-void Player::Move()
-{
-	//移動速度
-	m_moveSpeed.x = 0.0f;
-	m_moveSpeed.z = 0.0f;
-	//ステックの入力量を取得
-	float lStick_x = g_pad[0]->GetLStickXF();
-	float lStick_y = g_pad[0]->GetLStickYF();
-	//cameraの前方向と右方向を取得
-	Vector3 cameraForward = g_camera3D->GetForward();
-	Vector3 cameraRight = g_camera3D->GetRight();
-	//XZ平面での前方方向、右方向に変換する
-	cameraForward.y = 0.0f;
-	cameraForward.Normalize();
-	cameraRight.y = 0.0f;
-	cameraRight.Normalize();
-	//スティックの入力量×速度	
-	m_moveSpeed += cameraForward * lStick_y * 1000.0f;
-	m_moveSpeed += cameraRight * lStick_x * 1000.0f;
-	m_moveSpeed.y = 0.0f;
-	//キャラコンを使用して座標を動かす
-	m_position = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
-
-	//カメラ固定中ではなかったら
-	if (m_playerState == enPlayerState_Fishing)
-	{
-		//モデルの座標にキャラコンの座標を入れる
-		m_modelRender.SetPosition(m_position);
-	}
-	else
-	{
-		//モデルの座標にはカメラの座標を入れる
-		Vector3 newposition = m_camera->GetPosition();
-		newposition.y = 0.0f;
-		m_modelRender.SetPosition(newposition);
-	}
-}
-
-void Player::Rotation()
-{
-	//注視点へのベクトルを計算する
-	Vector3 vector = m_camera->GetTarget() - m_camera->GetPosition();
-	//正規化する
-	vector.Normalize();
-	//注視点を向く回転を作成
-	m_rotation.SetRotationYFromDirectionXZ(vector);
-	//回転を設定する
-	m_modelRender.SetRotation(m_rotation);
-}
-
-void Player::CalcCastPower()
-{
-	if (m_playerState != enPlayerState_ReadyCast)
-	{
-		return;
-	}
-
-	if (m_castPower > 1.0f)
-	{
-		m_castPower = 1.0f;
-		flag = true;
-	}
-	if (m_castPower < 0.0f)
-	{
-		m_castPower = 0.0f;
-		flag = false;
-	}
-
-	switch (flag)
-	{
-	case true:
-		m_castPower -= g_gameTime->GetFrameDeltaTime() * 0.5f;
-		break;
-	case false:
-		m_castPower += g_gameTime->GetFrameDeltaTime() * 0.5f;
-		break;
-	}
-}
-
-void Player::PlayAnimation()
-{
-	switch (m_playerState)
-	{
-	case enPlayerState_Idle:
-		m_modelRender.SetAnimationSpeed(1.0f);
-		m_modelRender.PlayAnimation(enAnimClip_Idle, 0.3f);
-		break;
-	case enPlayerState_Walk:
-		m_modelRender.SetAnimationSpeed(1.4f);
-		m_modelRender.PlayAnimation(enAnimClip_Walk, 0.3f);
-		break;
-	case enPlayerState_Cast:
-		m_modelRender.SetAnimationSpeed(2.0f);
-		m_modelRender.PlayAnimation(enAnimClip_Cast, 0.3f);
-		break;
-	case enPlayerState_ReadyCast:
-		m_modelRender.SetAnimationSpeed(1.0f);
-		m_modelRender.PlayAnimation(enAnimClip_ReadyCast, 0.3f);
-		break;
-	case enPlayerState_Fit:
-		m_modelRender.SetAnimationSpeed(1.0f);
-		m_modelRender.PlayAnimation(enAnimClip_Fit, 0.3f);
-		break;
+		switch (m_playerState)
+		{
+		case Player::enPlayerState_Cast:
+			if (a == false)
+			{
+				m_fishingFloat = NewGO<FishingFloat>(0, "fish");
+				a = true;
+			}
+			m_playerState = enPlayerState_Fishing_Idle;
+			break;
+		case Player::enPlayerState_Fishing_Idle:
+			break;
+		case Player::enPlayerState_Fit:
+			m_playerState = enPlayerState_Fishing;
+			break;
+		case Player::enPlayerState_Fishing:
+			break;
+		case Player::enPlayerState_ReadyCast:
+			if (g_pad[0]->IsPress(enButtonRB2) == false)
+			{
+				m_playerState = enPlayerState_Cast;
+			}
+			break;
+		}
 	}
 }
 
@@ -657,7 +753,7 @@ void Player::ProcessCommonStateTransition()
 		m_playerState = enPlayerState_ReadyCast;
 		return;
 	}
-	
+
 	//移動速度があったら
 	if (fabsf(m_moveSpeed.x) >= 0.001f ||
 		fabsf(m_moveSpeed.z) >= 0.001f)
@@ -692,6 +788,7 @@ void Player::ProcessCastStateTransition()
 	//アニメーションが再生中ではなかったら
 	if (m_modelRender.IsPlayingAnimation() == false)
 	{
+
 		if (g_pad[0]->IsTrigger(enButtonB))
 		{
 			//キャスト準備ステートへ
@@ -704,16 +801,10 @@ void Player::ProcessCastStateTransition()
 
 void Player::ProcessReadyCastStateTransition()
 {
-	////アニメーションが再生中ではなかったら
+	//アニメーションが再生中ではなかったら
 	if (m_modelRender.IsPlayingAnimation() == false)
 	{
-		//Aボタンが押されていなかったら
-		if (g_pad[0]->IsPress(enButtonRB2) == false)
-		{
-			//キャストステートへ
-			m_playerState = enPlayerState_Cast;
-			return;
-		}
+
 	}
 }
 
@@ -733,7 +824,12 @@ void Player::ProcessFishingStateTransition()
 	//アニメーションが再生中ではなかったら
 	if (m_modelRender.IsPlayingAnimation() == false)
 	{
-		return;
+		if (g_pad[0]->IsPress(enButtonRB2) == false)
+		{
+			//キャストステートへ
+			m_playerState = enPlayerState_Cast;
+			return;
+		}
 	}
 }
 void Player::Render(RenderContext& rc)
@@ -741,4 +837,5 @@ void Player::Render(RenderContext& rc)
 	//モデルの描画
 	m_modelRender.Draw(rc);
 	m_fontRender.Draw(rc);
+	m_fontRender2.Draw(rc);
 }

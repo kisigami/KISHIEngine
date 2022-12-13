@@ -4,6 +4,7 @@ class Player;
 class BackGround;
 class GameCamera;
 class UserInterface;
+class Fish;
 
 class Game : public IGameObject
 {
@@ -22,5 +23,6 @@ private:
 	BackGround* m_backGround = nullptr;
 	GameCamera* m_gameCamera = nullptr;
 	UserInterface* m_ui = nullptr;
+	Fish* m_fish;
 };
 
